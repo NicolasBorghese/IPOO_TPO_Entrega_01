@@ -28,7 +28,7 @@ class Viaje{
 
     //MODIFICADORES
     /**
-     * Modifíca el código del viaje, recibe por parámetro un código nuevo
+     * Modifica el código del viaje, recibe por parámetro un código nuevo
      * 
      * @param int $codigoNuevo
      */
@@ -37,7 +37,7 @@ class Viaje{
     }
 
     /**
-     * Modifíca el destino del viaje, recibe por parámetro un destino nuevo
+     * Modifica el destino del viaje, recibe por parámetro un destino nuevo
      * 
      * @param string $destinoNuevo
      */
@@ -46,7 +46,7 @@ class Viaje{
     }
 
     /**
-     * Modifíca la cantidad máxima de pasajeros, recibe por parámetro una nueva cantidad máxima
+     * Modifica la cantidad máxima de pasajeros, recibe por parámetro una nueva cantidad máxima
      * 
      * @param int $cantMaxima
      */
@@ -56,7 +56,7 @@ class Viaje{
     }
 
     /**
-     * Modifíca el arreglo de pasajeros, recibe por parámetro un arreglo nuevo de pasajeros
+     * Modifica el arreglo de pasajeros, recibe por parámetro un arreglo nuevo de pasajeros
      * 
      * @param array $arregloPasajeros
      */
