@@ -27,18 +27,17 @@ class Viaje{
     }
 
     //MODIFICADORES
-    /*
-    NO SE DEBERÍA MODIFICAR EL CÓDIGO DE UN VIAJE YA QUE SE ASUME QUE ES UN
-    IDENTIFICADOR ÚNIVOCO DEL VIAJE
-    (En tal caso se debe borrar y crear un viaje nuevo)
-
+    /**
+     * Modifíca el código del viaje, recibe por parámetro un código nuevo
+     * 
+     * @param int $codigoNuevo
+     */
     public function setCodigo($codigoNuevo){
         $this -> codigo = $codigoNuevo;
     }
-    */
 
     /**
-     * Modifíca el destino del viaje, recibe por parametro un destino nuevo
+     * Modifíca el destino del viaje, recibe por parámetro un destino nuevo
      * 
      * @param string $destinoNuevo
      */
@@ -47,40 +46,22 @@ class Viaje{
     }
 
     /**
-     * Modifíca la cantidad máxima de pasajeros
-     * Returna un booleano para indicar si la operación es válida
+     * Modifíca la cantidad máxima de pasajeros, recibe por parámetro una nueva cantidad máxima
      * 
      * @param int $cantMaxima
-     * @return boolean $numeroValido
      */
     public function setCantMaxPasajeros($cantMaxima){
-        // boolean $numeroValido
-        if (ctype_digit($cantMaxima) && $cantMaxima >= 0){
-            $numeroValido = true;
-            $this->cantMaxPasajeros = $cantMaxima;
-        } else {
-            $numeroValido = false;
-        }
-        return $numeroValido;
+        $this->cantMaxPasajeros = $cantMaxima;
+
     }
 
     /**
-     * Modifíca el arreglo de pasajeros, recibe por parametro un arreglo nuevo de pasajeros
-     * Retorna un booleano que indica si el arreglo de pasajeros se modificó exitosamente
-     * o si excede la cantidad permitida por el viaje
+     * Modifíca el arreglo de pasajeros, recibe por parámetro un arreglo nuevo de pasajeros
      * 
      * @param array $arregloPasajeros
-     * @return boolean
      */
     public function setPasajeros($arregloPasajeros){
-        // boolean $puedeAgregar
-        if(count($arregloPasajeros) > $this->cantMaxPasajeros){
-            $puedeAgregar = false;
-        }else{
-            $puedeAgregar = true;
             $this->pasajeros = $arregloPasajeros;
-        }
-        return $puedeAgregar;
     }
 
     //OBSERVADORES
@@ -128,45 +109,57 @@ class Viaje{
      */
     public function __toString(){
         //string $viaje
-        $viaje = "Código de viaje: ".$this->codigo."\n";
-        $viaje = $viaje ."Destino de viaje: ".$this->destino."\n";
-        $viaje = $viaje ."Cantidad máxima de pasajeros para este viaje: ".$this->cantMaxPasajeros."\n";
+        $viaje = "Código de viaje: ".$this->getCodigo()."\n";
+        $viaje = $viaje ."Destino de viaje: ".$this->getDestino()."\n";
+        $viaje = $viaje ."Cantidad máxima de pasajeros para este viaje: ".$this->getCantMaxPasajeros()."\n";
         $viaje = $viaje ."Información de los pasajeros del viaje: \n";
+        $viaje = $viaje . $this->pasajerosAString();
 
-        for($i = 0; $i < count($this->pasajeros); $i++){
-
-            $documento = $this->pasajeros[$i]["numero de documento"];
-            $nombre = $this->pasajeros[$i]["nombre"];
-            $apellido = $this->pasajeros[$i]["apellido"];
-            $viaje = $viaje ."Pasajero ". $i+1 .": [Documento: ".$documento.", Nombre: ".$nombre.", Apellido: ".$apellido."]\n";   
-        }
         return $viaje;
+    }
+
+    /**
+     * Devuelve un string con la información de todos los pasajeros del viaje
+     * 
+     * @return string
+     */
+    public function pasajerosAString(){
+        // string $cadenaPasajeros, $documento, $nombre, $apellido
+        $cadenaPasajeros = "";
+
+        for($i = 0; $i < count($this->getPasajeros()); $i++){
+            $documento = $this->getPasajeros()[$i]["numero de documento"];
+            $nombre = $this->getPasajeros()[$i]["nombre"];
+            $apellido = $this->getPasajeros()[$i]["apellido"];
+            $cadenaPasajeros = $cadenaPasajeros ."Pasajero ". $i+1 .": [Documento: ".$documento.", Nombre: ".$nombre.", Apellido: ".$apellido."]\n";   
+        }
+
+        return $cadenaPasajeros;
     }
     
     /**
      * Si hay espacio en el viaje y no existe previamente el documento del pasajero a ingresar, 
      * entonces se agrega el nuevo pasajero
-     * Retorna un string que indica si se agrego el pasajero exitosamente 
-     * o cual fue el error por el cual no se pudo agregar
+     * Retorna un booleano que indica si se agrego exitosamente el pasajero o no
      * 
      * @param array $nuevoPasajero
-     * @return string
+     * @return boolean
      */
     public function agregarPasajero($nuevoPasajero){
-        // string $mensaje
+        // boolean $exito
 
-        if (count($this->pasajeros) == $this->cantMaxPasajeros){
-            $mensaje = "ERROR: Límite máximo de pasajeros alcanzado\n";
+        if (count($this->getPasajeros()) == $this->getCantMaxPasajeros()){
+            $exito = false;
         } else {
             if ($this->buscaPasajero($nuevoPasajero["numero de documento"]) != -1){
-                $mensaje = "ERROR: Documento ya existente en el viaje\n";
+                $exito = false;
             } else {
-                $mensaje = "Pasajero agregado exitosamente\n";
+                $exito = true;
                 array_push($this->pasajeros, $nuevoPasajero);
             }
         }
 
-        return $mensaje;
+        return $exito;
     }
 
     /**
@@ -252,15 +245,15 @@ class Viaje{
         $existePasajero = false;
         $posPasajero = 0;
 
-        while ($existePasajero == false && $posPasajero < count($this->pasajeros)){
-            if ($nroDocumento == $this->pasajeros[$posPasajero]["numero de documento"]){
+        while ($existePasajero == false && $posPasajero < count($this->getPasajeros())){
+            if ($nroDocumento == $this->getPasajeros()[$posPasajero]["numero de documento"]){
                 $existePasajero = true;
                 $posPasajero--; 
             }
             $posPasajero++;
         }
 
-        if($posPasajero == count($this->pasajeros)){
+        if($posPasajero == count($this->getPasajeros())){
             $posPasajero = -1;
         }
 
