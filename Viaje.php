@@ -26,6 +26,43 @@ class Viaje{
         $this->pasajeros = [];
     }
 
+    //OBSERVADORES
+    /**
+     * Devuelve el código actual del viaje
+     * 
+     * @return int
+     */
+    public function getCodigo(){
+        return $this->codigo;
+    }
+
+    /**
+     * Devuelve el destino actual del viaje
+     * 
+     * @return string
+     */
+    public function getDestino(){
+        return $this->destino;
+    }
+
+    /**
+     * Devuelve la cantidad de pasajeros máxima establecida para el viaje actual
+     * 
+     * @return int
+     */
+    public function getCantMaxPasajeros(){
+        return $this->cantMaxPasajeros;
+    }
+
+    /**
+     * Devuelve el arreglo de pasajeros del viaje actual
+     * 
+     * @return array
+     */
+    public function getPasajeros(){
+        return $this->pasajeros;
+    }
+
     //MODIFICADORES
     /**
      * Modifica el código del viaje, recibe por parámetro un código nuevo
@@ -64,44 +101,7 @@ class Viaje{
             $this->pasajeros = $arregloPasajeros;
     }
 
-    //OBSERVADORES
-    /**
-     * Devuelve el código actual del viaje
-     * 
-     * @return int
-     */
-    public function getCodigo(){
-        return $this->codigo;
-    }
-
-    /**
-     * Devuelve el destino actual del viaje
-     * 
-     * @return string
-     */
-    public function getDestino(){
-        return $this->destino;
-    }
-
-    /**
-     * Devuelve la cantidad de pasajeros máxima establecida para el viaje actual
-     * 
-     * @return int
-     */
-    public function getCantMaxPasajeros(){
-        return $this->cantMaxPasajeros;
-    }
-
-    /**
-     * Devuelve el arreglo de pasajeros del viaje actual
-     * 
-     * @return array
-     */
-    public function getPasajeros(){
-        return $this->pasajeros;
-    }
-
-    //PROPIAS DE CLASE
+    //PROPIOS DE CLASE
     /**
      * Devuelve un string con todos los elementos que componen al viaje
      * 
@@ -147,6 +147,8 @@ class Viaje{
      */
     public function agregarPasajero($nuevoPasajero){
         // boolean $exito
+        // array $pasajerosAux
+        $pasajerosAux = [];
 
         if (count($this->getPasajeros()) == $this->getCantMaxPasajeros()){
             $exito = false;
@@ -155,7 +157,9 @@ class Viaje{
                 $exito = false;
             } else {
                 $exito = true;
-                array_push($this->pasajeros, $nuevoPasajero);
+                $pasajerosAux = $this->getPasajeros();
+                array_push($pasajerosAux, $nuevoPasajero);
+                $this->setPasajeros($pasajerosAux);
             }
         }
 
@@ -172,6 +176,8 @@ class Viaje{
     public function quitarPasajeroPorDocumento($documentoQuitar){
         // int $posPasajero
         // boolean $puedeQuitar
+        // array $pasajerosAux
+        $pasajerosAux = [];
 
         $posPasajero = $this->buscaPasajero($documentoQuitar);
 
@@ -179,9 +185,14 @@ class Viaje{
             $puedeQuitar = false;
         } else {
             $puedeQuitar = true;
-            unset($this->pasajeros[$posPasajero]);
-            $this->pasajeros = array_values($this->pasajeros);
+            $pasajerosAux = $this->getPasajeros();
+
+            unset($pasajerosAux[$posPasajero]);
+            $pasajerosAux = array_values($pasajerosAux);
+
+            $this->setPasajeros($pasajerosAux);
         }
+
         return $puedeQuitar;
     }
     
@@ -196,6 +207,8 @@ class Viaje{
     public function modificarNombrePorDocumento($nroDocumento, $nombreNuevo){
         // int $posPasajero
         // boolean $puedeModificar
+        // array $pasajerosAux
+        $pasajerosAux = [];
 
         $posPasajero = $this->buscaPasajero($nroDocumento);
 
@@ -203,7 +216,9 @@ class Viaje{
             $puedeModificar = false;
         } else {
             $puedeModificar = true;
-            $this->pasajeros[$posPasajero]["nombre"] = $nombreNuevo;
+            $pasajerosAux = $this->getPasajeros();
+            $pasajerosAux[$posPasajero]["nombre"] = $nombreNuevo;
+            $this->setPasajeros($pasajerosAux);
         }
         return $puedeModificar;
     }
@@ -219,6 +234,8 @@ class Viaje{
     public function modificarApellidoPorDocumento($nroDocumento, $apellidoNuevo){
         // int $posPasajero
         // boolean $puedeModificar
+        // array $pasajerosAux
+        $pasajerosAux = [];
 
         $posPasajero = $this->buscaPasajero($nroDocumento);
 
@@ -226,7 +243,9 @@ class Viaje{
             $puedeModificar = false;
         } else {
             $puedeModificar = true;
-            $this->pasajeros[$posPasajero]["apellido"] = $apellidoNuevo;
+            $pasajerosAux = $this->getPasajeros();
+            $pasajerosAux[$posPasajero]["apellido"] = $apellidoNuevo;
+            $this->setPasajeros($pasajerosAux);
         }
         return $puedeModificar;
     }
