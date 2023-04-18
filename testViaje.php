@@ -33,11 +33,13 @@ function menuDesplegable()
         echo "|| [7] Modificar el apellido de un pasajero por su número de documento             ||\n";
         echo "|| [8] Modificar el código del viaje actual                                        ||\n";
         echo "|| [9] Modificar el destino del viaje actual                                       ||\n";
-        echo "|| [10] Modificar la capacidad máxima de pasajeros del viaje actual                ||\n";
-        echo "|| [11] Mostrar el código del viaje actual                                         ||\n";
-        echo "|| [12] Mostrar el destino del viaje actual                                        ||\n";
-        echo "|| [13] Mostrar la cantidad máxima permitida de pasajeros para este viaje          ||\n";
-        echo "|| [14] Mostrar todos los pasajeros que se encuentran en el viaje actual           ||\n";
+        echo "|| [10] Modificar el responsable del viaje actual                                  ||\n";
+        echo "|| [11] Modificar la capacidad máxima de pasajeros del viaje actual                ||\n";
+        echo "|| [12] Mostrar el código del viaje actual                                         ||\n";
+        echo "|| [13] Mostrar el destino del viaje actual                                        ||\n";
+        echo "|| [14] Mostrar la cantidad máxima permitida de pasajeros para este viaje          ||\n";
+        echo "|| [15] Mostrar todos los pasajeros que se encuentran en el viaje actual           ||\n";
+        echo "|| [16] Mostrar quien es el responsable del viaje actual                           ||\n";
         echo "|| [0] Para finaizar el programa                                                   ||\n";
         echo "||                                                                                 ||\n";
         echo "-------------------------------------------------------------------------------------\n";
@@ -46,7 +48,7 @@ function menuDesplegable()
         $opcionElegida = trim(fgets(STDIN));
         
         // OBSERVAR: el rango varía según cantidad de opciones
-        if($opcionElegida < 0 || $opcionElegida > 14 || !ctype_digit($opcionElegida)){
+        if($opcionElegida < 0 || $opcionElegida > 16 || !ctype_digit($opcionElegida)){
             echo "\n";
             // Mensaje de error cuando la opción elegida está fuera de rango
             echo "-------------------------------------------------------------------------------------\n";
@@ -56,7 +58,7 @@ function menuDesplegable()
             detenerEjecucion();
         }
     // OBSERVAR: el rango varía según cantidad de opciones
-    } while ($opcionElegida < 0 || $opcionElegida > 14);
+    } while ($opcionElegida < 0 || $opcionElegida > 16);
 
     echo "\n";
 
@@ -332,8 +334,10 @@ function cargaAutomaticaPasajeros($viaje, $cantPasajeros){
             $nombre = generaNombreMujer(random_int(1,20));
         }
         $apellido = generaApellido(random_int(1,20));
-        $documento = 10000 + $i;
-        $arregloPasajeros[$i] = ["numero de documento" => $documento, "nombre" => $nombre, "apellido" => $apellido];
+        $documento = 400000 + $i;
+        $telefono = "299 1001".$i;
+
+        $arregloPasajeros[$i] = new Pasajero($nombre, $apellido, $documento, $telefono);
     }
 
     $viaje->setPasajeros($arregloPasajeros);
@@ -345,12 +349,14 @@ function cargaAutomaticaPasajeros($viaje, $cantPasajeros){
 
 // ***** Declaración de variables *****/
 // Viaje $viaje
+// ResponsableV $responsable
 // int $codigo, $capMaxima, $cantPasajeros, $documento
 // string $destino, $nombre, $apellido, $mensaje
 // array $pasajero
 // boolean $esPosible
 
-$viaje = new Viaje(1123, "Cordoba", 40);
+$responsable = new ResponsableV(31721, 100023, "Nicolás", "Borghese");
+$viaje = new Viaje(1123, "Cordoba", 40, $responsable);
 cargaAutomaticaPasajeros($viaje, random_int(10,20));
 echo "El programa cuenta con un primer viaje precargado\n";
 echo "\n";
@@ -373,9 +379,20 @@ do {
             $destino = trim(fgets(STDIN));
             echo "Ingrese la capacidad máxima de pasajeros para el nuevo viaje: ";
             $capMaxima = trim(fgets(STDIN));
+            echo "Ingrese los datos del responsable:\n";
+            echo "Nombre responsable: ";
+            $nombre = trim(fgets(STDIN));
+            echo "Apellido responsable: ";
+            $apellido = trim(fgets(STDIN));
+            echo "Número de empleado: ";
+            $numeroEmpleado = trim(fgets(STDIN));
+            echo "Número de licencia: ";
+            $numeroLicencia = trim(fgets(STDIN));
+
+            $responsable = new ResponsableV($numeroEmpleado, $numeroLicencia, $nombre, $apellido);
 
             if (ctype_digit($capMaxima) && $capMaxima >= 0){
-                $viaje = new Viaje($codigo, $destino, $capMaxima);
+                $viaje = new Viaje($codigo, $destino, $capMaxima, $responsable);
                 echo "Nuevo viaje creado exitosamente\n";
             } else {
                 echo "ERROR: valor inválido para capacidad máxima de pasajeros\n";
@@ -407,8 +424,10 @@ do {
             $nombre = trim(fgets(STDIN));
             echo "Ingrese el apellido del pasajero: ";
             $apellido = trim(fgets(STDIN));
+            echo "Ingrese el teléfono del pasajero: ";
+            $telefono = trim(fgets(STDIN));
 
-            $pasajero = ["numero de documento" => $documento, "nombre" => $nombre, "apellido" => $apellido];
+            $pasajero = new Pasajero($nombre, $apellido, $documento, $telefono);
             $puedeAgregar = $viaje->agregarPasajero($pasajero);
 
             if($puedeAgregar){
@@ -482,6 +501,21 @@ do {
             detenerEjecucion();
             break;
         case 10:
+            // Modifica al responsable actual del viaje
+            echo "Ingrese el nombre del nuevo responsable: ";
+            $nombre = trim(fgets(STDIN));
+            echo "Ingrese el apellido del nuevo responsable: ";
+            $apellido = trim(fgets(STDIN));
+            echo "Ingrese el número de empleado del nuevo responsable: ";
+            $numeroEmpleado = trim(fgets(STDIN));
+            echo "Ingrese el número de licencia del nuevo responsable: ";
+            $numeroLicencia = trim(fgets(STDIN));
+
+            $responsable = new ResponsableV($numeroEmpleado, $numeroLicencia, $nombre, $apellido);
+            $viaje->setResponsable($responsable);
+            
+            break;
+        case 11:
             // Modifica la cantidad máxima permitida de pasajeros en el viaje
             echo "Ingrese la nueva cantidad máxima permitida de pasajeros para este viaje: ";
             $capMaxima = trim(fgets(STDIN));
@@ -493,28 +527,33 @@ do {
             }
             detenerEjecucion();
             break;
-        case 11:
+        case 12:
             // Muestra el código del viaje actual
             echo "El código del viaje actual es: ".$viaje->getCodigo()."\n";
             detenerEjecucion();
             break;
-        case 12:
+        case 13:
             // Muestra el destino del viaje actual
             echo "El destino del viaje actual es: ".$viaje->getDestino()."\n";
             detenerEjecucion();
             break;
-        case 13:
+        case 14:
             // Muestra la cantidad máxima de pasajeros permitida para el viaje actual
             echo "La cantidad máxima de pasajeros permitida para el viaje actual es: ".$viaje->getCantMaxPasajeros()."\n";
             detenerEjecucion();
             break;
-        case 14:
+        case 15:
             // Muestra el arreglo de pasajeros del viaje actual
             echo "El arreglo de pasajeros del viaje actual es:\n";
-            print_r($viaje->getPasajeros());
+            $viaje->pasajerosAString();
             echo "\n";
             detenerEjecucion();
             break;
+        case 16:
+            // Muestra quien es el responsable del viaje actual
+            echo "El responsable del viaje actual es:\n";
+            $viaje->getResponsable()."\n";
+            echo"\n";
         case 0:
             // Finaliza el programa
             break;

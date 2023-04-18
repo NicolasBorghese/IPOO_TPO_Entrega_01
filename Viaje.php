@@ -1,5 +1,8 @@
 <?php
 
+include_once ("Pasajero.php");
+include_once ("ResponsableV.php");
+
 class Viaje{
 
     //ATRIBUTOS
@@ -7,8 +10,10 @@ class Viaje{
     private $destino;
     private $cantMaxPasajeros;
     private $pasajeros;
+    private $responsable;
+
     // Estructura del arreglo de pasajeros:
-    // pasajeros[numero] = ["numero de documento" => $nroDni, "nombre" => $nombre, "apellido" => $apellido];
+    // pasajeros[numero] = [objPasajero];
 
     //CONSTRUCTOR
     /**
@@ -19,11 +24,12 @@ class Viaje{
      * @param string $destinoNuevo
      * @param int $cantMax
      */
-    public function __construct($codigoNuevo, $destinoNuevo, $cantMax){
+    public function __construct($codigoNuevo, $destinoNuevo, $cantMax, $responsable){
         $this->codigo = $codigoNuevo;
         $this->destino = $destinoNuevo;
         $this->cantMaxPasajeros = $cantMax;
         $this->pasajeros = [];
+        $this->responsable = $responsable;
     }
 
     //OBSERVADORES
@@ -61,6 +67,15 @@ class Viaje{
      */
     public function getPasajeros(){
         return $this->pasajeros;
+    }
+
+    /**
+     * Devuelve un objeto de tipo ResponsableV que corresponde al responsable actual
+     * 
+     * @return ResponsableV
+     */
+    public function getResponsable(){
+        return $this->responsable;
     }
 
     //MODIFICADORES
@@ -101,6 +116,15 @@ class Viaje{
             $this->pasajeros = $arregloPasajeros;
     }
 
+    /**
+     * Modifica al responsable actual, recibe por parámetro un objeto de tipo ResponsableV
+     * 
+     * @param ResponsableV $responsable
+     */
+    public function setResponsable($responsable){
+        $this->responsable = $responsable;
+    }
+
     //PROPIOS DE CLASE
     /**
      * Devuelve un string con todos los elementos que componen al viaje
@@ -112,6 +136,7 @@ class Viaje{
         $viaje = "Código de viaje: ".$this->getCodigo()."\n";
         $viaje = $viaje ."Destino de viaje: ".$this->getDestino()."\n";
         $viaje = $viaje ."Cantidad máxima de pasajeros para este viaje: ".$this->getCantMaxPasajeros()."\n";
+        $viaje = $viaje ."Responsable del viaje: [".$this->getResponsable()."]\n";
         $viaje = $viaje ."Información de los pasajeros del viaje: \n";
         $viaje = $viaje . $this->pasajerosAString();
 
@@ -124,14 +149,11 @@ class Viaje{
      * @return string
      */
     public function pasajerosAString(){
-        // string $cadenaPasajeros, $documento, $nombre, $apellido
+        // string $cadenaPasajeros
         $cadenaPasajeros = "";
 
         for($i = 0; $i < count($this->getPasajeros()); $i++){
-            $documento = $this->getPasajeros()[$i]["numero de documento"];
-            $nombre = $this->getPasajeros()[$i]["nombre"];
-            $apellido = $this->getPasajeros()[$i]["apellido"];
-            $cadenaPasajeros = $cadenaPasajeros ."Pasajero ". $i+1 .": [Documento: ".$documento.", Nombre: ".$nombre.", Apellido: ".$apellido."]\n";   
+            $cadenaPasajeros = $cadenaPasajeros. "Pasajero N°". $i+1 ." [".($this->getPasajeros()[$i])."]\n";
         }
 
         return $cadenaPasajeros;
@@ -142,7 +164,7 @@ class Viaje{
      * entonces se agrega el nuevo pasajero
      * Retorna un booleano que indica si se agrego exitosamente el pasajero o no
      * 
-     * @param array $nuevoPasajero
+     * @param Pasajero $nuevoPasajero
      * @return boolean
      */
     public function agregarPasajero($nuevoPasajero){
@@ -153,7 +175,7 @@ class Viaje{
         if (count($this->getPasajeros()) == $this->getCantMaxPasajeros()){
             $exito = false;
         } else {
-            if ($this->buscaPasajero($nuevoPasajero["numero de documento"]) != -1){
+            if ($this->buscaPasajero($nuevoPasajero->getDocumento()) != -1){
                 $exito = false;
             } else {
                 $exito = true;
@@ -217,7 +239,7 @@ class Viaje{
         } else {
             $puedeModificar = true;
             $pasajerosAux = $this->getPasajeros();
-            $pasajerosAux[$posPasajero]["nombre"] = $nombreNuevo;
+            $pasajerosAux[$posPasajero]->setNombre($nombreNuevo);
             $this->setPasajeros($pasajerosAux);
         }
         return $puedeModificar;
@@ -244,13 +266,14 @@ class Viaje{
         } else {
             $puedeModificar = true;
             $pasajerosAux = $this->getPasajeros();
-            $pasajerosAux[$posPasajero]["apellido"] = $apellidoNuevo;
+            $pasajerosAux[$posPasajero]->setApellido($apellidoNuevo);
             $this->setPasajeros($pasajerosAux);
         }
         return $puedeModificar;
     }
 
     /**
+     * Metodo de acceso privado
      * Busca un pasajero por número de documento, si existe retorna su posición
      * si no existe retorna -1
      * 
@@ -265,7 +288,10 @@ class Viaje{
         $posPasajero = 0;
 
         while ($existePasajero == false && $posPasajero < count($this->getPasajeros())){
-            if ($nroDocumento == $this->getPasajeros()[$posPasajero]["numero de documento"]){
+
+            $docPasajeroEnCol = ($this->getPasajeros()[$posPasajero])->getDocumento();
+
+            if ($nroDocumento == $docPasajeroEnCol){
                 $existePasajero = true;
                 $posPasajero--; 
             }
@@ -278,6 +304,22 @@ class Viaje{
 
         return $posPasajero;
     }
+
+    /**
+     * Indica si ya existe o no un pasajero dentro del viaje comparando un documento ingresado
+     * 
+     * @param string $documento
+     * @return boolan
+     */
+    public function existePasajero($documento){
+        //boolean $existe
+        $existe = false;
+        if($this->buscaPasajero($documento) != -1){
+            $existe = true;
+        }
+        return $existe;
+    }
+
 
     /*
     NO SE DEBERÍA MODIFICAR EL NÚMERO DE DOCUMENTO DE UN PASAJERO YA QUE SE ASUME QUE ES UN 
