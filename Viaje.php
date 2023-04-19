@@ -9,11 +9,11 @@ class Viaje{
     private $codigo;
     private $destino;
     private $cantMaxPasajeros;
-    private $pasajeros;
+    private $colPasajeros;
     private $responsable;
 
     // Estructura del arreglo de pasajeros:
-    // pasajeros[numero] = [objPasajero];
+    // colPasajeros[numero] = [objPasajero];
 
     //CONSTRUCTOR
     /**
@@ -23,12 +23,13 @@ class Viaje{
      * @param int $codigoNuevo
      * @param string $destinoNuevo
      * @param int $cantMax
+     * @param ResponsableV $responsable
      */
     public function __construct($codigoNuevo, $destinoNuevo, $cantMax, $responsable){
         $this->codigo = $codigoNuevo;
         $this->destino = $destinoNuevo;
         $this->cantMaxPasajeros = $cantMax;
-        $this->pasajeros = [];
+        $this->colPasajeros = [];
         $this->responsable = $responsable;
     }
 
@@ -65,8 +66,8 @@ class Viaje{
      * 
      * @return array
      */
-    public function getPasajeros(){
-        return $this->pasajeros;
+    public function getColPasajeros(){
+        return $this->colPasajeros;
     }
 
     /**
@@ -85,7 +86,7 @@ class Viaje{
      * @param int $codigoNuevo
      */
     public function setCodigo($codigoNuevo){
-        $this -> codigo = $codigoNuevo;
+        $this->codigo = $codigoNuevo;
     }
 
     /**
@@ -108,12 +109,12 @@ class Viaje{
     }
 
     /**
-     * Modifica el arreglo de pasajeros, recibe por parámetro un arreglo nuevo de pasajeros
+     * Modifica la colección de pasajeros, recibe por parámetro un arreglo nuevo de pasajeros
      * 
      * @param array $arregloPasajeros
      */
-    public function setPasajeros($arregloPasajeros){
-            $this->pasajeros = $arregloPasajeros;
+    public function setColPasajeros($arregloPasajeros){
+            $this->colPasajeros = $arregloPasajeros;
     }
 
     /**
@@ -137,8 +138,8 @@ class Viaje{
         $viaje = $viaje ."Destino de viaje: ".$this->getDestino()."\n";
         $viaje = $viaje ."Cantidad máxima de pasajeros para este viaje: ".$this->getCantMaxPasajeros()."\n";
         $viaje = $viaje ."Responsable del viaje: [".$this->getResponsable()."]\n";
-        $viaje = $viaje ."Información de los pasajeros del viaje: \n";
-        $viaje = $viaje . $this->pasajerosAString();
+        $viaje = $viaje ."Pasajeros del viaje: \n";
+        $viaje = $viaje . $this->colPasajerosAString();
 
         return $viaje;
     }
@@ -148,13 +149,18 @@ class Viaje{
      * 
      * @return string
      */
-    public function pasajerosAString(){
+    public function colPasajerosAString(){
         // string $cadenaPasajeros
         $cadenaPasajeros = "";
 
-        for($i = 0; $i < count($this->getPasajeros()); $i++){
-            $cadenaPasajeros = $cadenaPasajeros. "Pasajero N°". $i+1 ." [".($this->getPasajeros()[$i])."]\n";
+        if(count($this->getColPasajeros())  == 0){
+            $cadenaPasajeros = "[Este viaje no tiene pasajeros cargados]";
+        } else {
+            for($i = 0; $i < count($this->getColPasajeros()); $i++){
+                $cadenaPasajeros = $cadenaPasajeros. "Pasajero N°". $i+1 ." [".($this->getColPasajeros()[$i])."]\n";
+            }
         }
+
 
         return $cadenaPasajeros;
     }
@@ -172,16 +178,16 @@ class Viaje{
         // array $pasajerosAux
         $pasajerosAux = [];
 
-        if (count($this->getPasajeros()) == $this->getCantMaxPasajeros()){
+        if (count($this->getColPasajeros()) == $this->getCantMaxPasajeros()){
             $exito = false;
         } else {
             if ($this->buscaPasajero($nuevoPasajero->getDocumento()) != -1){
                 $exito = false;
             } else {
                 $exito = true;
-                $pasajerosAux = $this->getPasajeros();
+                $pasajerosAux = $this->getColPasajeros();
                 array_push($pasajerosAux, $nuevoPasajero);
-                $this->setPasajeros($pasajerosAux);
+                $this->setColPasajeros($pasajerosAux);
             }
         }
 
@@ -198,8 +204,8 @@ class Viaje{
     public function quitarPasajeroPorDocumento($documentoQuitar){
         // int $posPasajero
         // boolean $puedeQuitar
-        // array $pasajerosAux
-        $pasajerosAux = [];
+        // array $colPasajerosAux
+        $colPasajerosAux = [];
 
         $posPasajero = $this->buscaPasajero($documentoQuitar);
 
@@ -207,12 +213,12 @@ class Viaje{
             $puedeQuitar = false;
         } else {
             $puedeQuitar = true;
-            $pasajerosAux = $this->getPasajeros();
+            $colPasajerosAux = $this->getColPasajeros();
 
-            unset($pasajerosAux[$posPasajero]);
-            $pasajerosAux = array_values($pasajerosAux);
+            unset($colPasajerosAux[$posPasajero]);
+            $colPasajerosAux = array_values($colPasajerosAux);
 
-            $this->setPasajeros($pasajerosAux);
+            $this->setColPasajeros($colPasajerosAux);
         }
 
         return $puedeQuitar;
@@ -229,8 +235,8 @@ class Viaje{
     public function modificarNombrePorDocumento($nroDocumento, $nombreNuevo){
         // int $posPasajero
         // boolean $puedeModificar
-        // array $pasajerosAux
-        $pasajerosAux = [];
+        // array $colPasajerosAux
+        $colPasajerosAux = [];
 
         $posPasajero = $this->buscaPasajero($nroDocumento);
 
@@ -238,9 +244,9 @@ class Viaje{
             $puedeModificar = false;
         } else {
             $puedeModificar = true;
-            $pasajerosAux = $this->getPasajeros();
-            $pasajerosAux[$posPasajero]->setNombre($nombreNuevo);
-            $this->setPasajeros($pasajerosAux);
+            $colPasajerosAux = $this->getColPasajeros();
+            $colPasajerosAux[$posPasajero]->setNombre($nombreNuevo);
+            $this->setColPasajeros($colPasajerosAux);
         }
         return $puedeModificar;
     }
@@ -256,8 +262,8 @@ class Viaje{
     public function modificarApellidoPorDocumento($nroDocumento, $apellidoNuevo){
         // int $posPasajero
         // boolean $puedeModificar
-        // array $pasajerosAux
-        $pasajerosAux = [];
+        // array $colPasajerosAux
+        $colPasajerosAux = [];
 
         $posPasajero = $this->buscaPasajero($nroDocumento);
 
@@ -265,9 +271,9 @@ class Viaje{
             $puedeModificar = false;
         } else {
             $puedeModificar = true;
-            $pasajerosAux = $this->getPasajeros();
-            $pasajerosAux[$posPasajero]->setApellido($apellidoNuevo);
-            $this->setPasajeros($pasajerosAux);
+            $colPasajerosAux = $this->getColPasajeros();
+            $colPasajerosAux[$posPasajero]->setApellido($apellidoNuevo);
+            $this->setColPasajeros($colPasajerosAux);
         }
         return $puedeModificar;
     }
@@ -287,9 +293,9 @@ class Viaje{
         $existePasajero = false;
         $posPasajero = 0;
 
-        while ($existePasajero == false && $posPasajero < count($this->getPasajeros())){
+        while ($existePasajero == false && $posPasajero < count($this->getColPasajeros())){
 
-            $docPasajeroEnCol = ($this->getPasajeros()[$posPasajero])->getDocumento();
+            $docPasajeroEnCol = ($this->getColPasajeros()[$posPasajero])->getDocumento();
 
             if ($nroDocumento == $docPasajeroEnCol){
                 $existePasajero = true;
@@ -298,7 +304,7 @@ class Viaje{
             $posPasajero++;
         }
 
-        if($posPasajero == count($this->getPasajeros())){
+        if($posPasajero == count($this->getColPasajeros())){
             $posPasajero = -1;
         }
 

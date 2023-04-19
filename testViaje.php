@@ -340,7 +340,7 @@ function cargaAutomaticaPasajeros($viaje, $cantPasajeros){
         $arregloPasajeros[$i] = new Pasajero($nombre, $apellido, $documento, $telefono);
     }
 
-    $viaje->setPasajeros($arregloPasajeros);
+    $viaje->setColPasajeros($arregloPasajeros);
 }
 
 /********************************************************************************/
@@ -433,7 +433,7 @@ do {
             if($puedeAgregar){
                 echo "El pasajero se agrego con exito\n";
             } else {
-                if (count($viaje->getPasajeros()) == $viaje->getCantMaxPasajeros()){
+                if (count($viaje->getColPasajeros()) == $viaje->getCantMaxPasajeros()){
                     echo "ERROR: el viaje se encuentra en su capacidad máxima de pasajeros\n";
                 } else {
                     echo "ERROR: el documento del pasajero ya se encuentra registrado dentro del viaje\n";
@@ -546,14 +546,14 @@ do {
         case 15:
             // Muestra el arreglo de pasajeros del viaje actual
             echo "El arreglo de pasajeros del viaje actual es:\n";
-            $viaje->pasajerosAString();
+            echo $viaje->colPasajerosAString();
             echo "\n";
             detenerEjecucion();
             break;
         case 16:
             // Muestra quien es el responsable del viaje actual
             echo "El responsable del viaje actual es:\n";
-            $viaje->getResponsable()."\n";
+            echo $viaje->getResponsable()."\n";
             echo"\n";
             detenerEjecucion();
             break;
