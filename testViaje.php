@@ -514,6 +514,7 @@ do {
             $responsable = new ResponsableV($numeroEmpleado, $numeroLicencia, $nombre, $apellido);
             $viaje->setResponsable($responsable);
             
+            detenerEjecucion();
             break;
         case 11:
             // Modifica la cantidad máxima permitida de pasajeros en el viaje
@@ -554,6 +555,8 @@ do {
             echo "El responsable del viaje actual es:\n";
             $viaje->getResponsable()."\n";
             echo"\n";
+            detenerEjecucion();
+            break;
         case 0:
             // Finaliza el programa
             break;
