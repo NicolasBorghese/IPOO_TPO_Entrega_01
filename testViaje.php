@@ -595,7 +595,7 @@ function crearColeccionPasajerosAutomatica($viaje, $cantPasajeros){
         }
         $apellido = generaApellido(random_int(1,20));
         $documento = 1000 + $i+1;
-        $telefono = "299 1000".$i+1;
+        $telefono = "299 500 000".$i+1;
 
         $asientoAleatorio = random_int(0, count($colAsientos)-1);
         $numeroAsiento = $colAsientos[$asientoAleatorio];
@@ -722,7 +722,6 @@ do {
                     }
                     if ($permitido){
                         $costo = $viaje->venderPasaje($pasajero);
-                        $viaje->actualizarRecaudacionTotal();
                         echo "\n";
                         echo "Pasaje vendido con éxito!\n";
                         echo "Deberá abonar: $".$costo."\n";
