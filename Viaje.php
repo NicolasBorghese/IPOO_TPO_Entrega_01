@@ -489,6 +489,7 @@ class Viaje{
      */
     public function mayorAsientoOcupado(){
         //int $asiento
+        //array $colPasajeros
         $asiento = 0;
         $this->ordenarPasajerosPorAsiento();
         $colPasajeros = $this->getColPasajeros();
