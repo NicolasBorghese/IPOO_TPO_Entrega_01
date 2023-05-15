@@ -50,7 +50,7 @@ class ResponsableV{
         $this->apellido = $apellido;
     }
 
-    //PROPIOS DE CLASE
+    //PROPIOS DE LA CLASE
     /**
      * Devuelve un string que contiene toda la información del estado de una instancia de tipo ResponsableV
      * 
@@ -58,10 +58,10 @@ class ResponsableV{
      */
     public function __toString(){
         //string $cadena
-        $cadena = "Número de empleado: ".$this->getNumeroEmpleado();
-        $cadena = $cadena. ", Número de licencia: ".$this->getNumeroLicencia();
-        $cadena = $cadena. ", Nombre: ".$this->getNombre();
-        $cadena = $cadena. ", Apellido: ".$this->getApellido();
+        $cadena = "[N° de empleado: ".$this->getNumeroEmpleado();
+        $cadena = $cadena. "|N° de licencia: ".$this->getNumeroLicencia();
+        $cadena = $cadena. "|Nombre: ".$this->getNombre();
+        $cadena = $cadena. "|Apellido: ".$this->getApellido()."]";
 
         return $cadena;
     }
