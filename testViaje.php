@@ -880,7 +880,6 @@ do {
         
                     if($esPosible){
                         echo "Pasajero quitado del viaje con éxito!\n";
-                        $viaje->actualizarRecaudacionTotal();
                     } else {
                         echo "ERROR: No se pudo quitar el pasajero del viaje\n";
                         echo "(no se encontro el documento cargado en el viaje actual)\n";
@@ -889,8 +888,7 @@ do {
                     break;
                 // [2] Quitar todos los pasajeros del viaje
                 case 2:
-                    $viaje->setColPasajeros([]);
-                    $viaje->actualizarRecaudacionTotal();
+                    $viaje->vaciarViaje();
                     echo "Todos los pasajeros han sido quitados del viaje con éxito!\n";
                     detenerEjecucion();
                     break;
