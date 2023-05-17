@@ -527,8 +527,15 @@ function crearPasajero(){
                 if(strtolower($servicioComida) == "si"){
                     $reqComida = true;
                 }
-                $pasajero = new PasajeroEspecial($nombre, $apellido, $documento, $telefono, 
-                $numeroAsiento, $numeroTicket, $reqSilla, $reqAsistencia, $reqComida);
+
+                if(!$reqSilla && !$reqAsistencia && !$reqComida){
+                    $pasajero = new Pasajero($nombre, $apellido, $documento, $telefono, 
+                    $numeroAsiento, $numeroTicket);
+                } else {
+                    $pasajero = new PasajeroEspecial($nombre, $apellido, $documento, $telefono, 
+                    $numeroAsiento, $numeroTicket, $reqSilla, $reqAsistencia, $reqComida);
+                }
+
                 break;
             default:
                 $permitido = false;
@@ -705,46 +712,41 @@ do {
                 // [2] Vender un pasaje del viaje a un pasajero
                 case 2:
                     $pasajero = crearPasajero();
-                    $permitido = true;
-                    if($viaje->existePasajero($pasajero->getDocumento())){
-                        echo "ERROR: ya existe este número de documento dentro del viaje\n";
-                        $permitido = false;
-                    }
-                    if($viaje->esAsientoOcupado($pasajero->getNumeroAsiento())){
-                        echo "ERROR: el asiento elegido ya se encuentra ocupado\n";
-                        $permitido = false;
-                    }
-                    if($pasajero->getNumeroAsiento() > $viaje->getCantMaxPasajeros()){
-                        echo "ERROR: el asiento elegido no existe dentro del viaje\n";
-                        $permitido = false;
-                    }
-                    if (!$viaje->hayPasajesDisponible()){
-                        echo "ERROR: el viaje tiene todos sus pasajes vendidos\n"; 
-                        $permitido = false;
-                    }
-                    if ($permitido){
-                        $costo = $viaje->venderPasaje($pasajero);
-                        echo "\n";
+                    $costo = $viaje->venderPasaje($pasajero);
+                    echo "\n";
+                    if($costo != -1){
                         echo "¡Pasaje vendido con éxito!\n";
                         echo "Deberá abonar: $".$costo."\n";
+                    } else {
+                        if($viaje->existePasajero($pasajero->getDocumento())){
+                            echo "ERROR: ya existe este número de documento dentro del viaje\n";
+                        }
+                        if($viaje->esAsientoOcupado($pasajero->getNumeroAsiento())){
+                            echo "ERROR: el asiento elegido ya se encuentra ocupado\n";
+                        }
+                        if($pasajero->getNumeroAsiento() > $viaje->getCantMaxPasajeros()){
+                            echo "ERROR: el asiento elegido no existe dentro del viaje\n";
+                        }
+                        if (!$viaje->hayPasajesDisponible()){
+                            echo "ERROR: el viaje tiene todos sus pasajes vendidos\n"; 
+                        }
                     }
                     detenerEjecucion();
                     break;
                 // [3] Asignar una colección de pasajeros nueva al viaje
                 case 3:
                     echo "Ingrese la cantidad de pasajeros aleatorios que desea crear: ";
-                    $cantPasajeros = intval(trim(fgets(STDIN)));
-                    if ($cantPasajeros < 0){
+                    $cantPasajeros = (trim(fgets(STDIN)));
+                    echo "\n";
+                    if (!ctype_digit($cantPasajeros) || $cantPasajeros < 0 ){
                         echo "ERROR: valor no válido para cantidad de pasajeros\n";
+                    } else if($cantPasajeros > $viaje->getCantMaxPasajeros()){
+                        echo "ERROR: la cantidad de pasajeros ingresada excede la capacidad máxima del viaje\n";
                     } else {
-                        if ($cantPasajeros > $viaje->getCantMaxPasajeros()){
-                            echo "ERROR: la cantidad de pasajeros ingresada excede la capacidad máxima del viaje\n";
-                        } else {
                             $colPasajeros = crearColeccionPasajerosAutomatica($viaje, $cantPasajeros);
                             $viaje->setColPasajeros($colPasajeros);
                             $viaje->actualizarRecaudacionTotal();
                             echo "¡Carga automática de pasajeros realizada con éxito!\n";
-                        }
                     }
                     detenerEjecucion();
                     break;
@@ -783,8 +785,8 @@ do {
                     do{
                         $permitido = true;
                         echo "Ingrese el nuevo costo de pasaje para el viaje: ";
-                        $costo = (float)trim(fgets(STDIN));
-                        if($costo < 0){
+                        $costo = trim(fgets(STDIN));
+                        if($costo < 0 || !is_numeric($costo)){
                             $permitido = false;
                             echo "ERROR: valor ingresado para costo de pasaje inválido\n";
                         }
@@ -956,12 +958,10 @@ do {
                         echo "ERROR: No se pudo modificar el número de asiento del pasajero\n";
                         if(!$viaje->existePasajero($documento)){
                             echo "(no se encontro el documento cargado en el viaje actual)\n";
+                        }else if($numeroAsiento <= $viaje->getCantMaxPasajeros()){
+                            echo "(el número de asiento elegido se encuentra ocupado por otro pasajero)\n";
                         }else{
-                            if($numeroAsiento <= $viaje->getCantMaxPasajeros()){
-                                echo "(el número de asiento elegido se encuentra ocupado por otro pasajero)\n";
-                            }else{
-                                echo "(no existe en el viaje el número de asiento elegido)\n";
-                            }
+                            echo "(no existe en el viaje el número de asiento elegido)\n";
                         }
                     }
                     detenerEjecucion();
