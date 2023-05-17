@@ -304,7 +304,7 @@ class Viaje{
      */
     public function mostrarAsientosLibres(){
         //int $posAsiento, $ultimoAsiento, $cantidadPasajeros
-        //string $asientosLibres
+        //string $asientosLibres, $imagen, $desfasaje, $ultimaImagen
         //array $colPasajeros
         $posAsiento = 1;
         $posPasajero = 0;
@@ -312,6 +312,7 @@ class Viaje{
         $this->ordenarPasajerosPorAsiento();
         $colPasajeros = $this->getColPasajeros();
         $cantidadPasajeros = count($colPasajeros);
+        $desfasaje = "";
         $imagen =         "   _======___________======_\n";
         $imagen = $imagen."  /                         \ \n";
         $imagen = $imagen." /.-------------------------.\ \n";
@@ -326,12 +327,14 @@ class Viaje{
                     if ($posAsiento == $colPasajeros[$posPasajero]->getNumeroAsiento()){
                         $posPasajero++;
                         $imagen = $imagen . "| [ -- ]";
+                        $desfasaje = "--";
                     }else{
                         if($posAsiento < 10){
                             $imagen = $imagen . "| [ 0".$posAsiento." ]";
                         }else{
                             $imagen = $imagen . "| [ ".$posAsiento." ]";
                         }
+                        $desfasaje = $posAsiento."";
                     }
                 } else {
                     if($posAsiento < 10){
@@ -339,18 +342,21 @@ class Viaje{
                     }else{
                         $imagen = $imagen . "| [ ".$posAsiento." ]";
                     }
+                    $desfasaje = $posAsiento."";
                 }
             } else if ((($posAsiento+2) % 4 == 0)) {
                 if($posPasajero < $cantidadPasajeros) {
                     if ($posAsiento == $colPasajeros[$posPasajero]->getNumeroAsiento()){
                         $posPasajero++;
                         $imagen = $imagen . "[ -- ]";
+                        $desfasaje = $desfasaje."--";
                     }else{
                         if($posAsiento < 10){
                             $imagen = $imagen . "[ 0".$posAsiento." ]";
                         }else{
                             $imagen = $imagen . "[ ".$posAsiento." ]";
                         }
+                        $desfasaje = $desfasaje . $posAsiento."";
                     }
                 } else {
                     if($posAsiento < 10){
@@ -358,18 +364,21 @@ class Viaje{
                     }else{
                         $imagen = $imagen . "[ ".$posAsiento." ]";
                     }
+                    $desfasaje = $desfasaje . $posAsiento."";
                 }
             } else if ((($posAsiento+1) % 4 == 0)){
                 if($posPasajero < $cantidadPasajeros) {
                     if ($posAsiento == $colPasajeros[$posPasajero]->getNumeroAsiento()){
                         $posPasajero++;
                         $imagen = $imagen . "   [ -- ]";
+                        $desfasaje = $desfasaje."--";
                     }else{
                         if($posAsiento < 10){
                             $imagen = $imagen . "   [ 0".$posAsiento." ]";
                         }else{
                             $imagen = $imagen . "   [ ".$posAsiento." ]";
                         }
+                        $desfasaje = $desfasaje . $posAsiento."";
                     }
                 } else {
                     if($posAsiento < 10){
@@ -377,20 +386,33 @@ class Viaje{
                     }else{
                         $imagen = $imagen . "   [ ".$posAsiento." ]";
                     }
+                    $desfasaje = $desfasaje . $posAsiento."";
                 }
             } else if (($posAsiento % 4 == 0)){
                 if($posPasajero < $cantidadPasajeros) {
                     if ($posAsiento == $colPasajeros[$posPasajero]->getNumeroAsiento()){
                         $posPasajero++;
-                        $imagen = $imagen . "[ -- ] |\n";
+                        if(strlen($desfasaje) < 7){
+                            $imagen = $imagen . "[ -- ] |\n";
+                        } else if (strlen($desfasaje) == 7){
+                            $imagen = $imagen . "[ -- ]|\n";
+                        } else {
+                            $imagen = $imagen . "[ -- ]\n";
+                        }
                         $imagen = $imagen."| |                         | |\n";
-
                     }else{
                         if($posAsiento < 10){
                             $imagen = $imagen . "[ 0".$posAsiento." ] |\n";
                             $imagen = $imagen."| |                         | |\n";
                         }else{
-                            $imagen = $imagen . "[ ".$posAsiento." ] |\n";
+                            $desfasaje = $desfasaje . $posAsiento."";
+                            if(strlen($desfasaje) < 9){
+                                $imagen = $imagen . "[ ".$posAsiento." ] |\n";
+                            } else if (strlen($desfasaje) == 9){
+                                $imagen = $imagen . "[ ".$posAsiento." ]|\n";
+                            } else {
+                                $imagen = $imagen . "[ ".$posAsiento." ]\n";
+                            }
                             $imagen = $imagen."| |                         | |\n";
                         }
                     }
@@ -399,7 +421,14 @@ class Viaje{
                         $imagen = $imagen . "[ 0".$posAsiento." ] |\n";
                         $imagen = $imagen."| |                         | |\n";
                     }else{
-                        $imagen = $imagen . "[ ".$posAsiento." ] |\n";
+                        $desfasaje = $desfasaje . $posAsiento."";
+                        if(strlen($desfasaje) < 9){
+                            $imagen = $imagen . "[ ".$posAsiento." ] |\n";
+                        } else if (strlen($desfasaje) == 9){
+                            $imagen = $imagen . "[ ".$posAsiento." ]|\n";
+                        } else {
+                            $imagen = $imagen . "[ ".$posAsiento." ]\n";
+                        }
                         $imagen = $imagen."| |                         | |\n";
                     }
                 }
@@ -409,22 +438,28 @@ class Viaje{
         $posAsiento--;
 
         if((($posAsiento+3) % 4 == 0)){
-            $imagen = $imagen ."                    | |\n";
+            $ultimaImagen = "                    | |";
+            $ultimaImagen = substr($ultimaImagen, strlen($desfasaje)-2);
+            $imagen = $imagen . $ultimaImagen . "\n";
             $imagen = $imagen."| |                         | |\n";
         } else if ((($posAsiento+2) % 4 == 0)){
-            $imagen = $imagen ."              | |\n";
+            $ultimaImagen = "              | |";
+            $ultimaImagen = substr($ultimaImagen, strlen($desfasaje)-4);
+            $imagen = $imagen . $ultimaImagen . "\n";
             $imagen = $imagen."| |                         | |\n";
         }else if ((($posAsiento+1) % 4 == 0)){
-            $imagen = $imagen ."     | |\n";
+            $ultimaImagen = "     | |";
+            $ultimaImagen = substr($ultimaImagen, strlen($desfasaje)-6);
+            $imagen = $imagen . $ultimaImagen. "\n";
             $imagen = $imagen."| |                         | |\n";
         }
-        $imagen = $imagen."|  -------------------------  |\n";
+        $imagen = $imagen."| '_________________________' |\n";
         $imagen = $imagen."| /                         \ |\n";
         $imagen = $imagen."|'---------------------------'|\n";
         $imagen = $imagen."'-=====-----------------=====-'\n";
 
         if($ultimoAsiento == 0){
-            $imagen = "[El vehículo de transporte no tiene asientos]";
+            $imagen = "[El vehículo de transporte no tiene asientos para pasajeros]";
         }
         return $imagen;
     }

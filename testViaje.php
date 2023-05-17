@@ -772,7 +772,7 @@ do {
                         echo "con los asientos ocupados actualmente\n";
                     }else{
                         $viaje->setCantMaxPasajeros($capMaxima);
-                        echo "Cantidad máxima de pasajeros seteada con éxito!\n";
+                        echo "Cantidad máxima de pasajeros modificada con éxito!\n";
                     }
                     detenerEjecucion();
                     break;
@@ -952,8 +952,15 @@ do {
                         echo "Se modificó el número asiento del pasajero con éxito!\n";
                     } else {
                         echo "ERROR: No se pudo modificar el número de asiento del pasajero.\n";
-                        echo "(Puede que el documento no exista, que el asiento elegido este ocupado\n"; 
-                        echo "o se haya ingresado mal algún valor)";
+                        if(!$viaje->existePasajero($documento)){
+                            echo "(no se encontro el documento cargado en el viaje actual)\n";
+                        }else{
+                            if($numeroAsiento <= $viaje->getCantMaxPasajeros()){
+                                "(el número de asiento elegido se encuentra ocupado por otro pasajero)\n";
+                            }else{
+                                "(no existe en el viaje el número de asiento elegido)\n";
+                            }
+                        }
                     }
                     detenerEjecucion();
                     break;
