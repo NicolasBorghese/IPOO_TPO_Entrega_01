@@ -468,7 +468,7 @@ function crearPasajero(){
         $numeroAsiento = trim(fgets(STDIN));
         if(!ctype_digit($numeroAsiento) || $numeroAsiento < 1){
             $permitido = false;
-            echo "ERROR: valor ingresado para asiento elegido inválido.\n";
+            echo "ERROR: valor ingresado para asiento elegido inválido\n";
         }
     } while (!$permitido);
     echo "Número de ticket: ";
@@ -499,7 +499,7 @@ function crearPasajero(){
                     $cantMillas = trim(fgets(STDIN));
                     if(!ctype_digit($cantMillas) || $cantMillas < 0){
                         $permitido = false;
-                        echo "ERROR: valor ingresado para cantidad de millas inválido.\n";
+                        echo "ERROR: valor ingresado para cantidad de millas inválido\n";
                     }
                 } while (!$permitido);
                 $pasajero = new PasajeroVIP($nombre, $apellido, $documento, $telefono, 
@@ -684,7 +684,7 @@ do {
                         $capMaxima = trim(fgets(STDIN));
                         if(!ctype_digit($capMaxima) || $capMaxima < 0){
                             $permitido = false;
-                            echo "ERROR: valor ingresado para capacidad máxima inválido.\n";
+                            echo "ERROR: valor ingresado para capacidad máxima inválido\n";
                         }
                     }while(!$permitido);
                     $responsable = crearResponsable();
@@ -694,10 +694,12 @@ do {
                         $costo = (float)trim(fgets(STDIN));
                         if(!is_float($costo) || $costo < 0){
                             $permitido = false;
-                            echo "ERROR: valor ingresado para costo de pasaje inválido.\n";
+                            echo "ERROR: valor ingresado para costo de pasaje inválido\n";
                         }
                     }while(!$permitido);
                     $viaje = new Viaje($codigo, $destino, $capMaxima, [], $responsable, $costo);
+                    echo "\n";
+                    echo "¡Viaje creado con éxito!\n";
                     detenerEjecucion();
                     break;
                 // [2] Vender un pasaje del viaje a un pasajero
@@ -723,7 +725,7 @@ do {
                     if ($permitido){
                         $costo = $viaje->venderPasaje($pasajero);
                         echo "\n";
-                        echo "Pasaje vendido con éxito!\n";
+                        echo "¡Pasaje vendido con éxito!\n";
                         echo "Deberá abonar: $".$costo."\n";
                     }
                     detenerEjecucion();
@@ -741,7 +743,7 @@ do {
                             $colPasajeros = crearColeccionPasajerosAutomatica($viaje, $cantPasajeros);
                             $viaje->setColPasajeros($colPasajeros);
                             $viaje->actualizarRecaudacionTotal();
-                            echo "Carga automática de pasajeros realizada con éxito!\n";
+                            echo "¡Carga automática de pasajeros realizada con éxito!\n";
                         }
                     }
                     detenerEjecucion();
@@ -750,7 +752,7 @@ do {
                 case 4:
                     $responsable = crearResponsable();
                     $viaje->setResponsable($responsable);
-                    echo "Nuevo responsable cargado con éxito!";
+                    echo "¡Nuevo responsable cargado con éxito!";
                     detenerEjecucion();
                     break;
                 // [5] Modificar el destino del viaje
@@ -758,7 +760,7 @@ do {
                     echo "Ingrese el nuevo destino del viaje: ";
                     $destino = trim(fgets(STDIN));
                     $viaje->setDestino($destino);
-                    echo "Destino modificado con éxito!\n";
+                    echo "¡Destino modificado con éxito!\n";
                     detenerEjecucion();
                     break;
                 // [6] Modificar la cantidad máxima permitida de pasajeros para el viaje
@@ -772,7 +774,7 @@ do {
                         echo "con los asientos ocupados actualmente\n";
                     }else{
                         $viaje->setCantMaxPasajeros($capMaxima);
-                        echo "Cantidad máxima de pasajeros modificada con éxito!\n";
+                        echo "¡Cantidad máxima de pasajeros modificada con éxito!\n";
                     }
                     detenerEjecucion();
                     break;
@@ -784,12 +786,12 @@ do {
                         $costo = (float)trim(fgets(STDIN));
                         if($costo < 0){
                             $permitido = false;
-                            echo "ERROR: valor ingresado para costo de pasaje inválido.\n";
+                            echo "ERROR: valor ingresado para costo de pasaje inválido\n";
                         }
                     }while(!$permitido);
                     $viaje->setCostoPasaje($costo);
                     $viaje->actualizarRecaudacionTotal();
-                    echo "Nuevo costo para cada pasaje del viaje modificado con éxito!\n";
+                    echo "¡Nuevo costo para pasaje del viaje modificado con éxito!\n";
                     detenerEjecucion();
                     break;
                 // Vuelve al menú principal
@@ -877,9 +879,9 @@ do {
                     echo "Ingrese el número de documento del pasajero que desea quitar del viaje: ";
                     $documento = trim(fgets(STDIN));
                     $esPosible = $viaje->quitarPasajeroPorDocumento($documento);
-        
+                    echo "\n";
                     if($esPosible){
-                        echo "Pasajero quitado del viaje con éxito!\n";
+                        echo "¡Pasajero quitado del viaje con éxito!\n";
                     } else {
                         echo "ERROR: No se pudo quitar el pasajero del viaje\n";
                         echo "(no se encontro el documento cargado en el viaje actual)\n";
@@ -889,7 +891,7 @@ do {
                 // [2] Quitar todos los pasajeros del viaje
                 case 2:
                     $viaje->vaciarViaje();
-                    echo "Todos los pasajeros han sido quitados del viaje con éxito!\n";
+                    echo "¡Todos los pasajeros han sido quitados del viaje con éxito!\n";
                     detenerEjecucion();
                     break;
                 // [3] Modificar el nombre de un pasajero
@@ -899,9 +901,9 @@ do {
                     echo "Ingrese el nuevo nombre que desea asignar al pasajero: ";
                     $nombre = trim(fgets(STDIN));
                     $esPosible = $viaje->modificarNombrePorDocumento($documento, $nombre);
-        
+                    echo "\n";
                     if($esPosible){
-                        echo "Se modificó el nombre del pasajero con éxito!\n";
+                        echo "¡Se modificó el nombre del pasajero con éxito!\n";
                     } else {
                         echo "ERROR: no se pudo modificar el nombre del pasajero\n";
                         echo "(no se encontro el documento cargado en el viaje actual)\n";
@@ -915,9 +917,9 @@ do {
                     echo "Ingrese el nuevo apellido que desea asignar al pasajero: ";
                     $apellido = trim(fgets(STDIN));
                     $esPosible = $viaje->modificarApellidoPorDocumento($documento, $apellido);
-        
+                    echo "\n";
                     if($esPosible){
-                        echo "Se modificó el apellido del pasajero con éxito!\n";
+                        echo "¡Se modificó el apellido del pasajero con éxito!\n";
                     } else {
                         echo "ERROR: no se pudo modificar el apellido del pasajero\n";
                         echo "(no se encontro el documento cargado en el viaje actual)\n";
@@ -931,9 +933,9 @@ do {
                     echo "Ingrese el nuevo número de teléfono que desea asignar al pasajero: ";
                     $numeroTelefono = trim(fgets(STDIN));
                     $esPosible = $viaje->modificarTelefonoPorDocumento($documento, $numeroTelefono);
-        
+                    echo "\n";
                     if($esPosible){
-                        echo "Se modificó el número de teléfono del pasajero con éxito!\n";
+                        echo "¡Se modificó el número de teléfono del pasajero con éxito!\n";
                     } else {
                         echo "ERROR: no se pudo modificar el número de teléfono del pasajero\n";
                         echo "(no se encontro el documento cargado en el viaje actual)\n";
@@ -947,18 +949,18 @@ do {
                     echo "Ingrese el nuevo número de asiento que desea asignar al pasajero: ";
                     $numeroAsiento = trim(fgets(STDIN));
                     $esPosible = $viaje->modificarAsientoPorDocumento($documento, $numeroAsiento);
-        
+                    echo "\n";
                     if($esPosible){
-                        echo "Se modificó el número asiento del pasajero con éxito!\n";
+                        echo "¡Se modificó el número asiento del pasajero con éxito!\n";
                     } else {
-                        echo "ERROR: No se pudo modificar el número de asiento del pasajero.\n";
+                        echo "ERROR: No se pudo modificar el número de asiento del pasajero\n";
                         if(!$viaje->existePasajero($documento)){
                             echo "(no se encontro el documento cargado en el viaje actual)\n";
                         }else{
                             if($numeroAsiento <= $viaje->getCantMaxPasajeros()){
-                                "(el número de asiento elegido se encuentra ocupado por otro pasajero)\n";
+                                echo "(el número de asiento elegido se encuentra ocupado por otro pasajero)\n";
                             }else{
-                                "(no existe en el viaje el número de asiento elegido)\n";
+                                echo "(no existe en el viaje el número de asiento elegido)\n";
                             }
                         }
                     }
@@ -972,7 +974,7 @@ do {
                     if($pasajero == null){
                         echo "ERROR: el documento ingresado no corresponde a ningún pasajero en el viaje\n";
                     } else {
-                        echo "El pasajero encontrado es:\n";
+                        echo "Pasajero encontrado:\n";
                         echo $pasajero;
                         echo "\n";
                     }
@@ -986,7 +988,7 @@ do {
                     if($pasajero == null){
                         echo "ERROR: el número de asiento ingresado no corresponde a ningún pasajero en el viaje\n";
                     } else {
-                        echo "pasajero encontrado:\n";
+                        echo "Pasajero encontrado:\n";
                         echo $pasajero;
                         echo "\n";
                     }
