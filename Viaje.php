@@ -232,10 +232,12 @@ class Viaje{
         //float $costoPasajeFinal
         $pasajeDisponible = $this->hayPasajesDisponible();
         $existeDocumento = $this->existePasajero($objPasajero->getDocumento());
-        $asientoOcupado = $this->esAsientoOcupado($objPasajero->getNumeroAsiento());
 
+        $numeroAsiento = $objPasajero->getNumeroAsiento();
+        $asientoOcupado = $this->esAsientoOcupado($numeroAsiento);
 
-        if($pasajeDisponible && !$existeDocumento && !$asientoOcupado){
+        if($pasajeDisponible && !$existeDocumento && !$asientoOcupado && 
+        $numeroAsiento <= $this->getCantMaxPasajeros()){
             $this->agregarPasajero($objPasajero);
 
             $costoPasajeFinal = $this->valorFinalPasaje($objPasajero);
