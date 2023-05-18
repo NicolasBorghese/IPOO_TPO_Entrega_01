@@ -23,13 +23,13 @@ class Viaje{
     /**
      * Crea una instancia de Viaje
      * Recibe un código de viaje, un destino, la cantidad máxima de pasajeros del viaje,
-     * una colección de pasajeros, un responsable del viaje y el costo de pasaje para cada pasajero
+     * una colección de pasajeros, un responsable del viaje y el costo del pasaje
      * 
      * @param int $codigoNuevo
      * @param string $destinoNuevo
      * @param int $cantMax
      * @param ResponsableV $responsable
-     * @param float $costoViaje
+     * @param float $costoPasaje
      */
     public function __construct($codigoNuevo, $destinoNuevo, $cantMax, $colPasajeros, $responsable, $costoPasaje){
         $this->codigo = $codigoNuevo;

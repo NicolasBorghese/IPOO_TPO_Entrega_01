@@ -576,21 +576,21 @@ function crearResponsable(){
  * Crea un arreglo automático de pasajeros y lo setea al viaje actual recibido por parámetro
  * junto con la cantidad de pasajeros a agregar
  * 
- * @param Viaje $viaje
  * @param int $cantPasajeros
+ * @param int $cantAsientos
  * 
  * @return array $colPasajeros
  */
-function crearColeccionPasajerosAutomatica($viaje, $cantPasajeros){
-    // array $colPasajeros
-    // string $nombre, $apellido
-    // int $documento, $numeroAsiento, $numeroTicket, $tipoPasajero
+function crearColeccionPasajerosAutomatica($cantPasajeros, $cantAsientos){
+    // array $colPasajeros, $colAsientos
+    // string $nombre, $apellido, $numeroAsiento, $numeroTicket, $tipoPasajero
+    // int $documento, $reqSila, $reqAsistencia, $reqComida
     // boolean $reqSilla, $reqAsistencia, $reqComida
 
     $colPasajeros = [];
     $colAsientos = [];
 
-    for ($j=0; $j < $viaje->getCantMaxPasajeros(); $j++){
+    for ($j=0; $j < $cantAsientos; $j++){
         $colAsientos[$j] = $j+1;
     }
 
@@ -656,18 +656,19 @@ function crearColeccionPasajerosAutomatica($viaje, $cantPasajeros){
 // Viaje $viaje
 // ResponsableV $responsable
 // int $codigo, $capMaxima, $cantPasajeros, $documento, $opcionMenuPrincipal, $opcionMenuOperaciones
+// float $costo
 // string $destino, $nombre, $apellido, $numeroTelefono
 // array $colPasajeros
 // boolean $esPosible, $permitido
 
 $responsable = new ResponsableV(997, 31721, "Nicolás", "Borghese");
-$viaje = new Viaje(1001, "Plottier", 20, [], $responsable, 100);
-$colPasajeros = crearColeccionPasajerosAutomatica($viaje, 10);
-$viaje->setColPasajeros($colPasajeros);
-$viaje->actualizarRecaudacionTotal();
+$colPasajeros = crearColeccionPasajerosAutomatica(10, 20);
+$viaje = new Viaje(1001, "Plottier", 20, $colPasajeros, $responsable, 100);
 
 echo "\n";
-echo "El programa cuenta con un primer viaje precargado\n";
+echo "=====================================================================================\n";
+echo "|| El programa cuenta con un primer viaje precargado                               ||\n";
+echo "=====================================================================================\n";
 echo "\n";
 
 do {
@@ -743,7 +744,7 @@ do {
                     } else if($cantPasajeros > $viaje->getCantMaxPasajeros()){
                         echo "ERROR: la cantidad de pasajeros ingresada excede la capacidad máxima del viaje\n";
                     } else {
-                            $colPasajeros = crearColeccionPasajerosAutomatica($viaje, $cantPasajeros);
+                            $colPasajeros = crearColeccionPasajerosAutomatica($cantPasajeros, $viaje->getCantMaxPasajeros());
                             $viaje->setColPasajeros($colPasajeros);
                             $viaje->actualizarRecaudacionTotal();
                             echo "¡Carga automática de pasajeros realizada con éxito!\n";
