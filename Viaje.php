@@ -333,18 +333,20 @@ class Viaje{
                     }else{
                         if($posAsiento < 10){
                             $imagen = $imagen . "| [ 0".$posAsiento." ]";
+                            $desfasaje = "0".$posAsiento;
                         }else{
                             $imagen = $imagen . "| [ ".$posAsiento." ]";
-                        }
-                        $desfasaje = $posAsiento."";
+                            $desfasaje = $posAsiento."";
+                        } 
                     }
                 } else {
                     if($posAsiento < 10){
                         $imagen = $imagen . "| [ 0".$posAsiento." ]";
+                        $desfasaje = "0".$posAsiento;
                     }else{
                         $imagen = $imagen . "| [ ".$posAsiento." ]";
-                    }
-                    $desfasaje = $posAsiento."";
+                        $desfasaje = $posAsiento."";
+                    }    
                 }
             } else if ((($posAsiento+2) % 4 == 0)) {
                 if($posPasajero < $cantidadPasajeros) {
@@ -355,18 +357,20 @@ class Viaje{
                     }else{
                         if($posAsiento < 10){
                             $imagen = $imagen . "[ 0".$posAsiento." ]";
+                            $desfasaje = $desfasaje. "0" .$posAsiento;
                         }else{
                             $imagen = $imagen . "[ ".$posAsiento." ]";
-                        }
-                        $desfasaje = $desfasaje . $posAsiento."";
+                            $desfasaje = $desfasaje . $posAsiento."";
+                        }  
                     }
                 } else {
                     if($posAsiento < 10){
                         $imagen = $imagen . "[ 0".$posAsiento." ]";
+                        $desfasaje = $desfasaje. "0" .$posAsiento;
                     }else{
                         $imagen = $imagen . "[ ".$posAsiento." ]";
-                    }
-                    $desfasaje = $desfasaje . $posAsiento."";
+                        $desfasaje = $desfasaje . $posAsiento."";
+                    }  
                 }
             } else if ((($posAsiento+1) % 4 == 0)){
                 if($posPasajero < $cantidadPasajeros) {
@@ -377,18 +381,20 @@ class Viaje{
                     }else{
                         if($posAsiento < 10){
                             $imagen = $imagen . "   [ 0".$posAsiento." ]";
+                            $desfasaje = $desfasaje. "0" .$posAsiento;
                         }else{
                             $imagen = $imagen . "   [ ".$posAsiento." ]";
-                        }
-                        $desfasaje = $desfasaje . $posAsiento."";
+                            $desfasaje = $desfasaje . $posAsiento."";
+                        }   
                     }
                 } else {
                     if($posAsiento < 10){
                         $imagen = $imagen . "   [ 0".$posAsiento." ]";
+                        $desfasaje = $desfasaje. "0" .$posAsiento;
                     }else{
                         $imagen = $imagen . "   [ ".$posAsiento." ]";
-                    }
-                    $desfasaje = $desfasaje . $posAsiento."";
+                        $desfasaje = $desfasaje . $posAsiento."";
+                    }    
                 }
             } else if (($posAsiento % 4 == 0)){
                 if($posPasajero < $cantidadPasajeros) {
