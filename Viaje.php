@@ -308,7 +308,6 @@ class Viaje{
         //int $posAsiento, $ultimoAsiento, $cantidadPasajeros
         //string $asientosLibres, $imagen, $desfasaje, $ultimaImagen
         //array $colPasajeros
-        $posAsiento = 1;
         $posPasajero = 0;
         $ultimoAsiento = $this->getCantMaxPasajeros();
         $this->ordenarPasajerosPorAsiento();
@@ -322,7 +321,7 @@ class Viaje{
         $imagen = $imagen."| |  [     ]       [     ]  | |\n";
         $imagen = $imagen."| |                         | |\n";
 
-        while($posAsiento <= $ultimoAsiento){
+        for ($posAsiento = 1; $posAsiento <= $ultimoAsiento; $posAsiento++){
 
             if((($posAsiento+3) % 4 == 0)){
                 if($posPasajero < $cantidadPasajeros) {
@@ -441,7 +440,6 @@ class Viaje{
                     }
                 }
             }
-            $posAsiento++;
         }
         $posAsiento--;
 

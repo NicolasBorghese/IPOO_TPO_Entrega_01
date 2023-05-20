@@ -601,8 +601,12 @@ function crearColeccionPasajerosAutomatica($cantPasajeros, $cantAsientos){
             $nombre = generaNombreMujer(random_int(1,20));
         }
         $apellido = generaApellido(random_int(1,20));
+        
         $documento = 1000 + $i+1;
-        $telefono = "299 500 000".$i+1;
+        
+        $randomTelefono = random_int(100, 999);
+        $acumTelefono = 1000 + $i;
+        $telefono = "299 ".$randomTelefono." ".$acumTelefono;
 
         $asientoAleatorio = random_int(0, count($colAsientos)-1);
         $numeroAsiento = $colAsientos[$asientoAleatorio];
