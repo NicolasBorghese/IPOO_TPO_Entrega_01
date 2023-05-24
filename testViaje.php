@@ -859,7 +859,9 @@ do {
                     break;
                 // [9] Visualizar los asientos libres
                 case 9:
-                    echo "Los asientos libres del viaje son aquellos que tienen número visible:\n";
+                    echo "=====================================================================================\n";
+                    echo "|| Los asientos libres del viaje son aquellos que tienen número visible            ||\n";
+                    echo "=====================================================================================\n";
                     echo "\n";
                     echo $viaje->mostrarAsientosLibres()."\n";
                     detenerEjecucion();
