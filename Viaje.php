@@ -802,7 +802,7 @@ class Viaje{
             $posPasajero++;
         }
 
-        if($posPasajero == count($this->getColPasajeros())){
+        if(!$existePasajero){
             $posPasajero = -1;
         }
 
