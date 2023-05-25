@@ -680,7 +680,7 @@ do {
     $opcionMenuPrincipal = menuPrincipal();
 
     switch ($opcionMenuPrincipal){
-        // [1] MENÚ PARA CREAR/MODIFICAR VIAJE
+        // [[1]] MENÚ PARA CREAR/MODIFICAR VIAJE
         case 1:
             $opcionMenuOperaciones = menuModificarViaje();
             switch($opcionMenuOperaciones){
@@ -809,7 +809,7 @@ do {
                     break;
             }
             break;
-        // [2] MENÚ PARA OBSERVAR DATOS DEL VIAJE
+        // [[2]] MENÚ PARA OBSERVAR DATOS DEL VIAJE
         case 2:
             $opcionMenuOperaciones = menuObservarViaje();
             switch($opcionMenuOperaciones){
@@ -879,7 +879,7 @@ do {
                     break;
             }
             break;
-        // [3] MENÚ PARA QUITAR/MODIFICAR PASAJEROS DEL VIAJE
+        // [[3]] MENÚ PARA QUITAR/MODIFICAR PASAJEROS DEL VIAJE
         case 3:
             $opcionMenuOperaciones = menuModificarPasajero();
             switch($opcionMenuOperaciones){
