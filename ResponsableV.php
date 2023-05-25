@@ -58,8 +58,8 @@ class ResponsableV{
      */
     public function __toString(){
         //string $cadena
-        $cadena = "[N° de empleado: ".$this->getNumeroEmpleado()."]";
-        $cadena = $cadena. "[N° de licencia: ".$this->getNumeroLicencia()."]";
+        $cadena = "[N°. empleado: ".$this->getNumeroEmpleado()."]";
+        $cadena = $cadena. "[N°. licencia: ".$this->getNumeroLicencia()."]";
         $cadena = $cadena. "[Nombre: ".$this->getNombre()."]";
         $cadena = $cadena. "[Apellido: ".$this->getApellido()."]";
 

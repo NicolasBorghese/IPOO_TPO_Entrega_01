@@ -190,8 +190,8 @@ class Viaje{
         $viaje = "Código de viaje: ".$this->getCodigo()."\n";
         $viaje = $viaje ."Destino de viaje: ".$this->getDestino()."\n";
         $viaje = $viaje ."Cantidad máxima de pasajeros para este viaje: ".$this->getCantMaxPasajeros()."\n";
-        $viaje = $viaje ."Responsable del viaje:\n".$this->getResponsable()."\n";
-        $viaje = $viaje ."Costo de cada pasaje del viaje: $".$this->getCostoPasaje()."\n";
+        $viaje = $viaje ."Responsable del viaje: ".$this->getResponsable()."\n";
+        $viaje = $viaje ."Costo de pasaje del viaje: $".$this->getCostoPasaje()."\n";
         $viaje = $viaje. "Recaudación total del viaje: $".$this->getRecaudacionTotal()."\n";
         $viaje = $viaje ."Pasajeros del viaje: \n\n";
         $viaje = $viaje . $this->colPasajerosAString();
@@ -486,7 +486,8 @@ class Viaje{
             array_push($colOrdenada, $colPasajeros[$i]);
             $posAsiento = count($colOrdenada)-1;
 
-            while($posAsiento > 0 && $colOrdenada[$posAsiento]->getNumeroAsiento() < $colOrdenada[$posAsiento-1]->getNumeroAsiento()){
+            while($posAsiento > 0 && 
+            $colOrdenada[$posAsiento]->getNumeroAsiento() < $colOrdenada[$posAsiento-1]->getNumeroAsiento()){
 
                 $pasajeroAux = $colOrdenada[$posAsiento-1];
                 $colOrdenada[$posAsiento-1] = $colOrdenada[$posAsiento];
