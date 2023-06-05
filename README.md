@@ -1,7 +1,7 @@
 # IPOO TP 3 ENTREGABLE Fecha de cierre 17/05/23
 
 Esta rama corresponde a la entrega número 3 del TP obligatorio de IPOO.
-Este TPO extiende las funcionalidades desarrolladas en los TP ENTREGABLES 1 y 2 aplicando los conceptos de Herencia, superclase y polimorfismo.
+Este TPO extiende las funcionalidades desarrolladas en los TP ENTREGABLES 1 y 2 añadiendo los conceptos de Herencia, superclase y polimorfismo.
 
 * ENUNCIADO
 
