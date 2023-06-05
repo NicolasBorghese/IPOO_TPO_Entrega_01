@@ -1,5 +1,4 @@
 <?php
-include_once "Pasajero.php";
 
 class PasajeroEspecial extends Pasajero{
 
@@ -111,8 +110,11 @@ class PasajeroEspecial extends Pasajero{
      */
     public function darPorcentajeIncremento(){
         //float $porcIncremento
-        $porcIncremento = 15;
-        if($this->cantidadServicios() > 1){
+        $porcIncremento = parent::darPorcentajeIncremento();
+        
+        if($this->cantidadServicios() == 1){
+            $porcIncremento = 15;
+        } else if ($this->cantidadServicios() > 1){
             $porcIncremento = 30;
         }
         return $porcIncremento;

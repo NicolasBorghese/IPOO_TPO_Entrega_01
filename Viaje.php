@@ -1,10 +1,5 @@
 <?php
 
-include_once "Pasajero.php";
-include_once "PasajeroVIP.php";
-include_once "PasajeroEspecial.php";
-include_once "ResponsableV.php";
-
 class Viaje{
 
     //ATRIBUTOS
@@ -28,6 +23,7 @@ class Viaje{
      * @param int $codigoNuevo
      * @param string $destinoNuevo
      * @param int $cantMax
+     * @param array $colPasajeros
      * @param ResponsableV $responsable
      * @param float $costoPasaje
      */
@@ -193,8 +189,8 @@ class Viaje{
         $viaje = $viaje ."Responsable del viaje: ".$this->getResponsable()."\n";
         $viaje = $viaje ."Costo de pasaje del viaje: $".$this->getCostoPasaje()."\n";
         $viaje = $viaje. "Recaudación total del viaje: $".$this->getRecaudacionTotal()."\n";
-        $viaje = $viaje ."Pasajeros del viaje: \n\n";
-        $viaje = $viaje . $this->colPasajerosAString();
+        $viaje = $viaje ."Pasajeros del viaje:\n\n";
+        $viaje = $viaje . $this->mostrarPasajeros();
 
         return $viaje;
     }
@@ -204,7 +200,7 @@ class Viaje{
      * 
      * @return string
      */
-    public function colPasajerosAString(){
+    public function mostrarPasajeros(){
         // string $cadenaPasajeros
         $cadenaPasajeros = "";
 
@@ -538,7 +534,7 @@ class Viaje{
         $asiento = 0;
         $this->ordenarPasajerosPorAsiento();
         $colPasajeros = $this->getColPasajeros();
-        if(count($colPasajeros) > 1){
+        if(count($colPasajeros) >= 1){
             $asiento = $colPasajeros[count($colPasajeros)-1]->getNumeroAsiento();
         }
         return $asiento;
@@ -577,6 +573,16 @@ class Viaje{
             $recaudacionTotal = $recaudacionTotal + $costoPasaje;
         }
         $this->setRecaudacionTotal($recaudacionTotal);
+    }
+
+    /**
+     * Renueva la colección de pasajeros y actualiza la recaudación total
+     * 
+     * @param array $colPasajeros
+     */
+    public function renovarPasajeros($colPasajeros){
+        $this->setColPasajeros($colPasajeros);
+        $this->actualizarRecaudacionTotal();
     }
 
     /**
@@ -716,7 +722,6 @@ class Viaje{
         // boolean $puedeModificar
         // array $colPasajerosAux
         $colPasajerosAux = [];
-
         $posPasajero = $this->buscaPasajero($nroDocumento);
 
         if($posPasajero == -1 || $this->esAsientoOcupado($asientoNuevo) ||
@@ -727,6 +732,123 @@ class Viaje{
             $colPasajerosAux = $this->getColPasajeros();
             $colPasajerosAux[$posPasajero]->setNumeroAsiento($asientoNuevo);
             $this->setColPasajeros($colPasajerosAux);
+        }
+        return $puedeModificar;
+    }
+
+    /**
+     * Busca un pasajero especial por su número de documento dentro del viaje, si existe
+     * modifica los campos de pasajero especial según los datos recibidos por parámetro
+     * y actualiza la recaudación total del viaje
+     * Retorna true si es posible, false en caso contrario
+     * 
+     * @param string $documento
+     * @param string $servicioSilla
+     * @param string $servicioAsistencia
+     * @param string $servicioComida
+     * 
+     * @return boolean
+     */
+    public function modificarServiciosEspecialesPorDocumento(
+        $documento, $servicioSilla, $servicioAsistencia, $servicioComida){
+        //int $posPasajero
+        //float $recaudacionTotal
+        //boolean $reqSilla, $reqAsistencia, $reqComida, $puedeModificar
+        //array $colPasajeros
+
+        $puedeModificar = false;
+        $posPasajero = $this->buscaPasajero($documento);
+
+        if($posPasajero != -1){
+            $colPasajeros = $this->getColPasajeros();
+
+            if($colPasajeros[$posPasajero] instanceof PasajeroEspecial){
+
+                $puedeModificar = true;
+                $recaudacionTotal = $this->getRecaudacionTotal();
+                $recaudacionTotal -= $this->valorFinalPasaje($colPasajeros[$posPasajero]);
+
+                if(strtolower($servicioSilla) == "si"){
+                    $reqSilla = true;
+                } else if (strtolower($servicioSilla) == "no"){
+                    $reqSilla = false;
+                } else {
+                    $reqSilla = $colPasajeros[$posPasajero]->getReqSilla();
+                }
+    
+                if(strtolower($servicioAsistencia) == "si"){
+                    $reqAsistencia = true;
+                } else if (strtolower($servicioAsistencia) == "no"){
+                    $reqAsistencia = false;
+                } else {
+                    $reqAsistencia = $colPasajeros[$posPasajero]->getReqAsistencia();
+                }
+    
+                if(strtolower($servicioComida) == "si"){
+                    $reqComida = true;
+                } else if (strtolower($servicioComida) == "no"){
+                    $reqComida = false;
+                } else {
+                    $reqComida = $colPasajeros[$posPasajero]->getReqComida();
+                }
+    
+                $colPasajeros[$posPasajero]->setReqSilla($reqSilla);
+                $colPasajeros[$posPasajero]->setReqAsistencia($reqAsistencia);
+                $colPasajeros[$posPasajero]->setReqComida($reqComida);
+
+                $recaudacionTotal += $this->valorFinalPasaje($colPasajeros[$posPasajero]);
+                $this->setRecaudacionTotal($recaudacionTotal);
+                $this->setColPasajeros($colPasajeros);
+            }
+        }
+        return $puedeModificar;
+    }
+
+    /**
+     * Busca un pasajero VIP por su número de documento dentro del viaje, si existe
+     * modifica los campos de pasajero VIP según los datos recibidos por parámetro
+     * y actualiza la recaudación total del viaje
+     * Retorna true si es posible, false en caso contrario
+     * 
+     * @param string $documento
+     * @param string $nroViajeroFrecuente
+     * @param int $cantMillas
+     * 
+     * @return boolean
+     */
+    public function modificarCamposVIPPorDocumento(
+        $documento, $nroViajeroFrecuente, $cantMillas){
+        //int $posPasajero
+        //float $recaudacionTotal
+        //boolean $puedeModificar
+        //array $colPasajeros
+
+        $puedeModificar = false;
+        $posPasajero = $this->buscaPasajero($documento);
+
+        if($posPasajero != -1){
+            $colPasajeros = $this->getColPasajeros();
+
+            if($colPasajeros[$posPasajero] instanceof PasajeroVIP){
+
+                $puedeModificar = true;
+                $recaudacionTotal = $this->getRecaudacionTotal();
+                $recaudacionTotal -= $this->valorFinalPasaje($colPasajeros[$posPasajero]);
+
+                if($nroViajeroFrecuente == ""){
+                    $nroViajeroFrecuente = $colPasajeros[$posPasajero]->getNroViajeroFrecuente();
+                }
+                if(!ctype_digit($cantMillas) || $cantMillas < 0){
+                    $cantMillas = $colPasajeros[$posPasajero]->getCantMillas();
+                }
+    
+                $colPasajeros[$posPasajero]->setNroViajeroFrecuente($nroViajeroFrecuente);
+                $colPasajeros[$posPasajero]->setCantMillas($cantMillas);
+
+                $recaudacionTotal += $this->valorFinalPasaje($colPasajeros[$posPasajero]);
+                $this->setRecaudacionTotal($recaudacionTotal);
+                $this->setColPasajeros($colPasajeros);
+            }
         }
         return $puedeModificar;
     }
@@ -780,7 +902,7 @@ class Viaje{
     /**
      * Metodo de acceso privado
      * Busca un pasajero por número de documento, si existe retorna su posición
-     * si no existe retorna -1
+     * en la colección de pasajeros, si no existe retorna -1
      * 
      * @param $nroDocumento
      * @return int
@@ -788,7 +910,6 @@ class Viaje{
     private function buscaPasajero($nroDocumento){
         // boolean $existePasajero
         // int $posPasajero
-
         $existePasajero = false;
         $posPasajero = 0;
 
@@ -806,7 +927,6 @@ class Viaje{
         if(!$existePasajero){
             $posPasajero = -1;
         }
-
         return $posPasajero;
     }
 
