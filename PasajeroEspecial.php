@@ -11,6 +11,19 @@ class PasajeroEspecial extends Pasajero{
     si el pasajero necesita ese servicio o no */
 
     //CONSTUCTOR
+    /**
+     * Crea una instancia de la clase PasajeroEspecial
+     * 
+     * @param string $nombre
+     * @param string $apellido
+     * @param string $documento
+     * @param string $telefono
+     * @param string $numeroAsiento
+     * @param int $numeroTicket
+     * @param boolean $reqSilla
+     * @param boolean $reqAsistencia
+     * @param boolean $reqComida
+     */
     public function __construct(
         $nombre,
         $apellido,
@@ -29,35 +42,81 @@ class PasajeroEspecial extends Pasajero{
         $this->reqComida = $reqComida;
     }
 
-    //OBSERVADORES
+    /*/=======================================================================================\*\
+    ||                                        OBSERVADORES                                     ||
+    \*\=======================================================================================/*/
+
+    /**
+     * Devuelve un booleano que indica si el pasajero necesita el servicio de silla de ruedas
+     * 
+     * @return boolean
+     */
     public function getReqSilla(){
         return $this->reqSilla;
     }
 
+    /**
+     * Devuelve un booleano que indica si el pasajero necesita el servicio de asistencia de 
+     * embarque/desembarque
+     * 
+     * @return boolean
+     */
     public function getReqAsistencia(){
         return $this->reqAsistencia;
     }
 
+    /**
+     * Devuelve un booleano que indica si el pasajero necesita el servicio de comida especial
+     * 
+     * @return boolean
+     */
     public function getReqComida(){
         return $this->reqComida;
     }
 
-    //MODIFICADORES
+    /*/=======================================================================================\*\
+    ||                                       MODIFICADORES                                     ||
+    \*\=======================================================================================/*/
+
+    /**
+     * Modifica el estado del requerimiento de silla de ruedas
+     * 
+     * @param boolean $reqSilla
+     */
     public function setReqSilla($reqSilla){
         $this->reqSilla = $reqSilla;
     }
 
+    /**
+     * Modifica el estado del requerimiento de asistencia de embarque/desembarque
+     * 
+     * @param boolean $reqAsistencia
+     */
     public function setReqAsistencia($reqAsistencia){
         $this->reqAsistencia = $reqAsistencia;
     }
 
+    /**
+     * Modifica el estado del requerimiento de comida especial
+     * 
+     * @param boolean $reqComida
+     */
     public function setReqComida($reqComida){
         $this->reqComida = $reqComida;
     }
 
-    //PROPIOS DE LA CLASE
-    public function __toString(){
+    /*/=======================================================================================\*\
+    ||                                 PROPIOS DE LA CLASE                                     ||
+    \*\=======================================================================================/*/
 
+    /**
+     * Devuelve un string que contiene toda la información del estado
+     * de una instancia de tipo PasajeroEspecial
+     * 
+     * @return string
+     */
+    public function __toString(){
+        //string $cadena
         $cadena = parent::__toString();
         $cadena = $cadena . "[Silla de ruedas: ".$this->reqAString($this->getReqSilla())."]";
         $cadena = $cadena . "[Asistencia: ".$this->reqAString($this->getReqAsistencia())."]";
