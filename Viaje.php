@@ -185,7 +185,7 @@ class Viaje{
         //string $viaje
         $viaje = "Código de viaje: ".$this->getCodigo()."\n";
         $viaje = $viaje ."Destino de viaje: ".$this->getDestino()."\n";
-        $viaje = $viaje ."Cantidad máxima de pasajeros para este viaje: ".$this->getCantMaxPasajeros()."\n";
+        $viaje = $viaje ."Cantidad máxima de pasajeros permitida: ".$this->getCantMaxPasajeros()."\n";
         $viaje = $viaje ."Responsable del viaje: ".$this->getResponsable()."\n";
         $viaje = $viaje ."Costo de pasaje del viaje: $".$this->getCostoPasaje()."\n";
         $viaje = $viaje. "Recaudación total del viaje: $".$this->getRecaudacionTotal()."\n";
@@ -275,7 +275,10 @@ class Viaje{
         $colPasajeros = $this->getColPasajeros();
         $cantidadPasajeros = count($colPasajeros);
         $desfasaje = "";
-        $imagen =         "   _======___________======_\n";
+        $imagen =         "=====================================================================================\n";
+        $imagen = $imagen."|| Los asientos libres del viaje son aquellos que tienen número visible            ||\n";
+        $imagen = $imagen."=====================================================================================\n\n";
+        $imagen = $imagen."   _======___________======_\n";
         $imagen = $imagen."  /                         \ \n";
         $imagen = $imagen." /.-------------------------.\ \n";
         $imagen = $imagen."| \_________________________/ |\n";
@@ -817,10 +820,11 @@ class Viaje{
         $colPasajerosAux = [];
         $posPasajero = $this->buscaPasajero($documento);
 
-        if($posPasajero == -1 || $this->esAsientoOcupado($asientoNuevo) ||
+        if(!ctype_digit($asientoNuevo) || $posPasajero == -1 || $this->esAsientoOcupado($asientoNuevo) ||
         $asientoNuevo > $this->getCantMaxPasajeros() || $asientoNuevo < 1){
             $puedeModificar = false;
         } else {
+            $asientoNuevo = (int)$asientoNuevo;
             $puedeModificar = true;
             $colPasajerosAux = $this->getColPasajeros();
             $colPasajerosAux[$posPasajero]->setNumeroAsiento($asientoNuevo);
