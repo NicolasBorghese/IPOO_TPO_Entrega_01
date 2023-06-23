@@ -633,14 +633,17 @@ function visualizarIDsViajes($empresaActiva){
     $viaje = new Viaje();
     $colViajes = $viaje->listar("viaje.idempresa = ".$idEmpresa);
 
+    $cadena = "=====================================================================================\n";
     if(count($colViajes) == 0){
-        $cadena = "[Esta empresa no tiene viajes cargados en la base de datos]\n";
+        $cadena = $cadena. "[Esta empresa no tiene viajes cargados en la base de datos]\n";
     } else {
-        $cadena = "IDs de viajes correspondientes a la empresa activa [ID empresa: ".$idEmpresa."][Nombre: ".$nombreEmpresa."]\n";
+        $cadena = $cadena. "IDs de viajes correspondientes a la empresa activa [ID empresa: ".$idEmpresa."][Nombre: ".$nombreEmpresa."]\n";
         for($i = 0; $i < count($colViajes); $i++){
-            $cadena = $cadena."[ID viaje: ".$colViajes[$i]->getCodigo() ."][Destino: ".$colViajes[$i]->getDestino()."]\n";
+            $cadena = $cadena."[ID viaje: ".$colViajes[$i]->getCodigo() ."][Destino: ".$colViajes[$i]->getDestino().
+            "][Costo de pasaje sin impuestos: $".$colViajes[$i]->getCostoPasaje()."]\n";
         }
     }
+    $cadena = $cadena. "=====================================================================================\n";
     return $cadena;
 }
 
@@ -654,15 +657,17 @@ function visualizarIDsResponsables(){
     $responsable = new ResponsableV();
     $colResponsables = $responsable->listar("");
 
+    $cadena = "=====================================================================================\n";
     if(count($colResponsables) == 0){
-        $cadena = "[Este sistema no tiene responsables cargados en la base de datos]\n";
+        $cadena = $cadena. "[Este sistema no tiene responsables cargados en la base de datos]\n";
     } else {
-        $cadena = "IDs de responsables en sistema:\n";
+        $cadena = $cadena. "IDs de responsables en sistema:\n";
         for($i = 0; $i < count($colResponsables); $i++){
             $cadena = $cadena."[ID responsable: ".$colResponsables[$i]->getNumeroEmpleado() .
             "][Nombre: ".$colResponsables[$i]->getNombre()."][Apellido: ".$colResponsables[$i]->getApellido()."]\n";
         }
     }
+    $cadena = $cadena. "=====================================================================================\n";
     return $cadena;
 }
 
@@ -676,15 +681,17 @@ function visualizarIDsEmpresas(){
     $empresa = new Empresa();
     $colEmpresas = $empresa->listar("");
 
+    $cadena = "=====================================================================================\n";
     if(count($colEmpresas) == 0){
-        $cadena = "[Este sistema no tiene Empresas cargadas en la base de datos]\n";
+        $cadena = $cadena. "[Este sistema no tiene Empresas cargadas en la base de datos]\n";
     } else {
-        $cadena = "IDs de empresas en sistema:\n";
+        $cadena = $cadena. "IDs de empresas en sistema:\n";
         for($i = 0; $i < count($colEmpresas); $i++){
             $cadena = $cadena."[ID empresa: ".$colEmpresas[$i]->getIdEmpresa().
             "][Nombre: ".$colEmpresas[$i]->getNombreEmpresa()."]\n";
         }
     }
+    $cadena = $cadena. "=====================================================================================\n";
     return $cadena;
 }
 
@@ -700,11 +707,12 @@ function visualizarViajesResponsable($idResponsable){
     $viaje = new Viaje();
     $colViajes = $viaje->listar("rnumeroempleado = ".$idResponsable);
 
+    $cadena = "=====================================================================================\n";
     if (count($colViajes) == 0){
-        $cadena = "El responsable [ID: ".$idResponsable."] no se encuentra asignado a ningún viaje\n";
+        $cadena = $cadena. "El responsable [ID: ".$idResponsable."] no se encuentra asignado a ningún viaje\n";
 
     } else {
-        $cadena = "El responsable [ID: ".$idResponsable."] se encuentra asignado a los siguientes viajes:\n";
+        $cadena = $cadena. "El responsable [ID: ".$idResponsable."] se encuentra asignado a los siguientes viajes:\n";
 
         for ($i = 0; $i < count($colViajes); $i++){
             $cadena = $cadena. "[ID viaje: ".$colViajes[$i]->getCodigo()."]";
@@ -713,6 +721,7 @@ function visualizarViajesResponsable($idResponsable){
             $cadena = $cadena. "[Nombre Empresa: ".$colViajes[$i]->getEmpresa()->getNombreEmpresa()."]\n";
         }
     }
+    $cadena = $cadena. "=====================================================================================\n";
     return $cadena;
 }
 
@@ -1044,9 +1053,15 @@ function crearPasajero($idViaje, $ultimoTicket){
     } while (!$permitido);
     echo "Teléfono del pasajero: ";
     $telefono = trim(fgets(STDIN));
+
+    $viaje = new Viaje();
+    $viaje->Buscar($idViaje);
+    echo "\n";
+    echo $viaje->mostrarAsientosLibres()."\n";
+
     do{
         $permitido = true;
-        echo "Número de asiento elegido (campo con validación): ";
+        echo "Seleccione un número de asiento (campo obligatorio): ";
         $numeroAsiento = trim(fgets(STDIN));
         if(!ctype_digit($numeroAsiento) || $numeroAsiento < 1){
             $permitido = false;
@@ -1241,7 +1256,7 @@ do {
                 $empresa->insertar();
 
                 echo "\n";
-                echo "Nueva empresa creada con éxito\n";
+                echo "¡Nueva empresa creada con éxito!\n";
                 detenerEjecucion();
                 break;
             // [2] Visualizar información completa de la empresa activa
@@ -1519,7 +1534,8 @@ do {
                             echo "Cantidad máxima de pasajeros permitida actual: ".$viaje->getCantMaxPasajeros()."\n";
                             echo "Ingrese la nueva cantidad máxima permitida de pasajeros para este viaje: ";
                             $cantMaxPasajeros = trim(fgets(STDIN));
-                            if (!ctype_digit($cantMaxPasajeros) || $cantMaxPasajeros < 0){      
+                            echo "\n";
+                            if (!ctype_digit($cantMaxPasajeros) || $cantMaxPasajeros < 0){     
                                 echo "ERROR: valor ingresado para cantidad máxima de pasajeros inválido\n";
                             } else if ($cantMaxPasajeros < $viaje->mayorAsientoOcupado()){
                                 echo "ERROR: cantidad máxima ingresada no compatible\n";
@@ -1528,7 +1544,6 @@ do {
                                 $cantMaxPasajeros = (int)$cantMaxPasajeros;
                                 $viaje->setCantMaxPasajeros($cantMaxPasajeros);
                                 $viaje->modificar();
-                                echo "\n";
                                 echo "¡Cantidad máxima de pasajeros modificada con éxito!\n";
                             }
                             detenerEjecucion();
@@ -1546,7 +1561,7 @@ do {
                                 $viaje->modificar();
                                 echo "¡Nuevo responsable de viaje cargado con éxito!\n";
                             } else {
-                                echo "ERROR: el N° de empleado ingresado no corresponde a un responsable cargado en la base de datos";
+                                echo "ERROR: el N° de empleado ingresado no corresponde a un responsable cargado en la base de datos\n";
                             }
                             detenerEjecucion();
                             break;
@@ -1634,35 +1649,43 @@ do {
             case 4:
                 echo visualizarIDsResponsables();
                 echo "\n";
-                echo "Ingrese el número de empleado del responsable que desea eliminar de la BD: ";
-                $idResponsable = trim(fgets(STDIN));
+
                 $responsable = new ResponsableV();
-                $existe = $responsable->Buscar($idResponsable);
-                
-                if($existe){
-                    $viaje = new Viaje();
-                    $colViajes = $viaje->listar("rnumeroempleado = ".$idResponsable);
+                $colResponsables = $responsable->listar("");
 
-                    if (count($colViajes) == 0){
-                        $responsable->eliminar();
-                        echo "\n";
-                        echo "¡Responsable eliminado de la base de datos con éxito!\n";
-                    } else {
-                        $cadena = "El responsable no puede ser eliminado de la base de datos\n";
-                        $cadena = $cadena. "por que se encuentra asignado a los siguientes viajes:\n\n";
+                if(count($colResponsables) != 0){
 
-                        for ($i = 0; $i < count($colViajes); $i++){
-                            $cadena = $cadena. "[ID viaje: ".$colViajes[$i]->getCodigo()."]";
-                            $cadena = $cadena. "[Destino: ".$colViajes[$i]->getDestino()."]";
-                            $cadena = $cadena. "[ID Empresa: ".$colViajes[$i]->getEmpresa()->getIdEmpresa()."]";
-                            $cadena = $cadena. "[Nombre: ".$colViajes[$i]->getEmpresa()->getNombreEmpresa()."]\n";
+                    echo "Ingrese el número de empleado del responsable que desea eliminar de la BD: ";
+                    $idResponsable = trim(fgets(STDIN));
+                    $existe = $responsable->Buscar($idResponsable);
+                    
+                    if($existe){
+                        $viaje = new Viaje();
+                        $colViajes = $viaje->listar("rnumeroempleado = ".$idResponsable);
+
+                        if (count($colViajes) == 0){
+                            $responsable->eliminar();
+                            echo "\n";
+                            echo "¡Responsable eliminado de la base de datos con éxito!\n";
+                        } else {
+                            $cadena = "El responsable no puede ser eliminado de la base de datos\n";
+                            $cadena = $cadena. "por que se encuentra asignado a los siguientes viajes:\n\n";
+
+                            for ($i = 0; $i < count($colViajes); $i++){
+                                $cadena = $cadena. "[ID viaje: ".$colViajes[$i]->getCodigo()."]";
+                                $cadena = $cadena. "[Destino: ".$colViajes[$i]->getDestino()."]";
+                                $cadena = $cadena. "[ID Empresa: ".$colViajes[$i]->getEmpresa()->getIdEmpresa()."]";
+                                $cadena = $cadena. "[Nombre: ".$colViajes[$i]->getEmpresa()->getNombreEmpresa()."]\n";
+                            }
+                            echo "\n";
+                            echo $cadena;    
                         }
+                    } else {
                         echo "\n";
-                        echo $cadena;    
+                        echo "ERROR: El número de empleado igresado no corresponde a un responsable en el sistema\n";
+                        echo "Será redirigido al menú principal\n";
                     }
                 } else {
-                    echo "\n";
-                    echo "ERROR: El número de empleado igresado no corresponde a un responsable en el sistema\n";
                     echo "Será redirigido al menú principal\n";
                 }
                 $menuActivo = "Principal";
@@ -1681,69 +1704,78 @@ do {
 
         echo visualizarIDsResponsables();
         echo "\n";
-        echo "Ingrese el número de empleado del responsable que desea visualizar sus datos: ";
-        $idResponsable = trim(fgets(STDIN));
+
         $responsable = new ResponsableV();
-        $existe = $responsable->Buscar($idResponsable);
+        $colResponsables = $responsable->listar("");
 
-        if($existe){
-
-            do {
-                $opcionMenu = menuVisualizarResponsable($empresaActiva);
-
-                switch($opcionMenu){
-                    // [1] Mostrar todos los datos del responsable
-                    case 1:
-                        echo $responsable;
-                        echo "\n";
-                        detenerEjecucion();
-                        break;
-                    // [2] Mostrar número de empleado
-                    case 2:
-                        echo "El número de empleado es: ".$responsable->getNumeroEmpleado();
-                        echo "\n";
-                        detenerEjecucion();
-                        break;
-                    // [3] Mostrar número de licencia
-                    case 3:
-                        echo "El número de licencia es: ".$responsable->getNumeroLicencia();
-                        echo "\n";
-                        detenerEjecucion();
-                        break;
-                    // [4] Mostrar el nombre
-                    case 4:
-                        echo "El nombre del responsable es: ".$responsable->getNombre();
-                        echo "\n";
-                        detenerEjecucion();
-                        break;
-                    // [5] Mostrar el apellido
-                    case 5:
-                        echo "El apellido del responsable es: ".$responsable->getApellido();
-                        echo "\n";
-                        detenerEjecucion();
-                        break;
-                    // [6] Mostrar todos los viajes a los que se encuentra asignado
-                    case 6:
-                        echo visualizarViajesResponsable($idResponsable);
-                        echo "\n";
-                        detenerEjecucion();
-                        break;
-                    // [0] Volver al menú principal
-                    case 0:
-                        $menuActivo = "Principal";
-                        break;
-                    default:
-                        break;
-                }
-
-            } while ($opcionMenu != 0);
-            
+        if(count($colResponsables) != 0){
+            echo "Ingrese el número de empleado del responsable que desea visualizar sus datos: ";
+            $idResponsable = trim(fgets(STDIN));
+            $existe = $responsable->Buscar($idResponsable);
+    
+            if($existe){
+    
+                do {
+                    $opcionMenu = menuVisualizarResponsable($empresaActiva);
+    
+                    switch($opcionMenu){
+                        // [1] Mostrar todos los datos del responsable
+                        case 1:
+                            echo $responsable;
+                            echo "\n";
+                            detenerEjecucion();
+                            break;
+                        // [2] Mostrar número de empleado
+                        case 2:
+                            echo "El número de empleado es: ".$responsable->getNumeroEmpleado();
+                            echo "\n";
+                            detenerEjecucion();
+                            break;
+                        // [3] Mostrar número de licencia
+                        case 3:
+                            echo "El número de licencia es: ".$responsable->getNumeroLicencia();
+                            echo "\n";
+                            detenerEjecucion();
+                            break;
+                        // [4] Mostrar el nombre
+                        case 4:
+                            echo "El nombre del responsable es: ".$responsable->getNombre();
+                            echo "\n";
+                            detenerEjecucion();
+                            break;
+                        // [5] Mostrar el apellido
+                        case 5:
+                            echo "El apellido del responsable es: ".$responsable->getApellido();
+                            echo "\n";
+                            detenerEjecucion();
+                            break;
+                        // [6] Mostrar todos los viajes a los que se encuentra asignado
+                        case 6:
+                            echo visualizarViajesResponsable($idResponsable);
+                            echo "\n";
+                            detenerEjecucion();
+                            break;
+                        // [0] Volver al menú principal
+                        case 0:
+                            $menuActivo = "Principal";
+                            break;
+                        default:
+                            break;
+                    }
+    
+                } while ($opcionMenu != 0);
+                
+            } else {
+                echo "\n";
+                echo "ERROR: El número de empleado ingresado no corresponde a ningún responsable en la base de datos\n";
+                echo "Será redirigido al menú principal\n";
+                $menuActivo = "Principal";
+                detenerEjecucion();
+            }
         } else {
-            echo "\n";
-            echo "ERROR: El número de empleado ingresado no corresponde a ningún responsable en la base de datos\n";
             echo "Será redirigido al menú principal\n";
-            detenerEjecucion();
             $menuActivo = "Principal";
+            detenerEjecucion();
         }
     }
 
@@ -1751,37 +1783,46 @@ do {
 
         echo visualizarIDsResponsables();
         echo "\n";
-        echo "Ingrese el número de empleado del responsable que desea modificar sus datos: ";
-        $idResponsable = trim(fgets(STDIN));
+
         $responsable = new ResponsableV();
-        $existe = $responsable->Buscar($idResponsable);
+        $colResponsables = $responsable->listar("");
 
-        if($existe){
-            echo "Estado del responsable:\n";
-            echo $responsable."\n\n"; 
-    
-            echo "Ingrese los nuevos valores para cada campo que desee actualizar del responsable\n";
-            echo "(ignore los campos que no desee modificar)\n\n";
-            echo "Ingrese un nuevo nombre: ";
-            $nombre = trim(fgets(STDIN));
-            echo "Ingrese un nuevo apellido: ";
-            $apellido = trim(fgets(STDIN));
-            echo "Ingrese un nuevo número de licencia: ";
-            $numeroLicencia = trim(fgets(STDIN));
-            
-            $responsable->modificarResponsable($nombre, $apellido, $numeroLicencia);
-            $exito = $responsable->modificar();
+        if(count($colResponsables) != 0){
 
-            echo "\n";
-            if($exito){
-                echo "Responsable actualizado:\n";
-                echo $responsable."\n";
+            echo "Ingrese el número de empleado del responsable que desea modificar sus datos: ";
+            $idResponsable = trim(fgets(STDIN));
+            $responsable = new ResponsableV();
+            $existe = $responsable->Buscar($idResponsable);
+
+            if($existe){
+                echo "Estado del responsable:\n";
+                echo $responsable."\n\n"; 
+        
+                echo "Ingrese los nuevos valores para cada campo que desee actualizar del responsable\n";
+                echo "(ignore los campos que no desee modificar)\n\n";
+                echo "Ingrese un nuevo nombre: ";
+                $nombre = trim(fgets(STDIN));
+                echo "Ingrese un nuevo apellido: ";
+                $apellido = trim(fgets(STDIN));
+                echo "Ingrese un nuevo número de licencia: ";
+                $numeroLicencia = trim(fgets(STDIN));
+                
+                $responsable->modificarResponsable($nombre, $apellido, $numeroLicencia);
+                $exito = $responsable->modificar();
+
+                echo "\n";
+                if($exito){
+                    echo "Responsable actualizado:\n";
+                    echo $responsable."\n";
+                } else {
+                    echo $responsable->getMensajeOperacion();
+                }
             } else {
-                echo $responsable->getMensajeOperacion();
+                echo "\n";
+                echo "ERROR: El número de empleado ingresado no corresponde a ningún responsable en la base de datos\n";
             }
         } else {
-            echo "\n";
-            echo "ERROR: El número de empleado ingresado no corresponde a ningún responsable en la base de datos\n";
+            echo "Será redirigido al menú principal\n";
         }
         $menuActivo = "Principal";
         detenerEjecucion();        
@@ -1850,48 +1891,57 @@ do {
             
             echo "\n";
             if($existe){
-                
-                $pasajero = crearPasajero($idViaje, $ultimoTicket);
-                $pasajero2 = new Pasajero();
-                $colPasajeros = $pasajero2->listar("");
-                $pos = 0;
-                $exito = true;
 
-                while($pos < count($colPasajeros) && $exito){
-                    if($pasajero->getDocumento() == $colPasajeros[$pos]->getDocumento()){
-                        $exito = false;
+                if($viaje->cantidadAsientosDisponibles() != 0){
+
+                    $pasajero = crearPasajero($idViaje, $ultimoTicket);
+                    $pasajero2 = new Pasajero();
+                    $colPasajeros = $pasajero2->listar("");
+                    $pos = 0;
+                    $exito = true;
+    
+                    while($pos < count($colPasajeros) && $exito){
+                        if($pasajero->getDocumento() == $colPasajeros[$pos]->getDocumento()){
+                            $exito = false;
+                        }
+                        $pos++;
                     }
-                    $pos++;
-                }
-
-                echo "\n";
-                if($exito){
-                    $costo = $viaje->venderPasaje($pasajero);
-
-                    if($costo != -1){
-
-                        $ultimoTicket ++;
-                        echo "¡Pasaje vendido con éxito!\n";
-                        echo "Deberá abonar: $".$costo."\n";
-        
+    
+                    echo "\n";
+                    if($exito){
+                        $costo = $viaje->venderPasaje($pasajero);
+    
+                        if($costo != -1){
+    
+                            $ultimoTicket ++;
+                            echo "¡Pasaje vendido con éxito!\n";
+                            echo "Deberá abonar: $".$costo."\n\n";
+                            echo "Estado del pasajero: \n";
+                            echo $pasajero."\n";
+            
+                        } else {
+                            $pasajero->eliminar();
+                            if($viaje->existePasajero($pasajero->getDocumento())){
+                                echo "ERROR: ya existe este número de documento dentro del viaje\n";
+                            }
+                            if($viaje->esAsientoOcupado($pasajero->getNumeroAsiento())){
+                                echo "ERROR: el asiento elegido ya se encuentra ocupado\n";
+                            }
+                            if($pasajero->getNumeroAsiento() > $viaje->getCantMaxPasajeros()){
+                                echo "ERROR: el asiento elegido no existe dentro del viaje\n";
+                            }
+                            if (!$viaje->hayPasajesDisponible()){
+                                echo "ERROR: el viaje tiene todos sus pasajes vendidos\n"; 
+                            }
+                            echo "Será redirigido al menú principal\n";
+                        }
                     } else {
-                        $pasajero->eliminar();
-                        if($viaje->existePasajero($pasajero->getDocumento())){
-                            echo "ERROR: ya existe este número de documento dentro del viaje\n";
-                        }
-                        if($viaje->esAsientoOcupado($pasajero->getNumeroAsiento())){
-                            echo "ERROR: el asiento elegido ya se encuentra ocupado\n";
-                        }
-                        if($pasajero->getNumeroAsiento() > $viaje->getCantMaxPasajeros()){
-                            echo "ERROR: el asiento elegido no existe dentro del viaje\n";
-                        }
-                        if (!$viaje->hayPasajesDisponible()){
-                            echo "ERROR: el viaje tiene todos sus pasajes vendidos\n"; 
-                        }
+                        echo "\n";
+                        echo "ERROR: El documento de pasajero ingresado ya está se encuentra registrado en la base de datos\n";
+                        echo "Será redirigido al menú principal\n";
                     }
                 } else {
-                    echo "\n";
-                    echo "ERROR: El documento de pasajero ingresado ya está se encuentra registrado en la base de datos\n";
+                    echo "ERROR: Este viaje ya tiene todos sus pasajes vendidos\n";
                     echo "Será redirigido al menú principal\n";
                 }   
             } else {
@@ -1902,7 +1952,6 @@ do {
         }else{
             echo "Será redirigido al menú principal\n";
         }
-        echo"\n";
         $menuActivo = "Principal";
         detenerEjecucion();
     }
@@ -1920,25 +1969,34 @@ do {
             
             echo "\n";
             if($existe){
-                $asientosDisponibles = $viaje->cantidadAsientosDisponibles();
-                $pasajero = new Pasajero();
-                $maxDocumento = $pasajero->maximoDocumento();
 
-                echo "Ingrese la cantidad de pasajes que desea vender: ";
-                $cantPasajeros = (trim(fgets(STDIN)));
-                echo "\n";
-                if (!ctype_digit($cantPasajeros) || $cantPasajeros < 0 ){
-                    echo "ERROR: valor no válido para cantidad de pasajes\n";
-                } else if($cantPasajeros > $asientosDisponibles){
-                    echo "ERROR: la cantidad de pasajes ingresada para vender excede la capacidad máxima del viaje\n";
+                if($viaje->cantidadAsientosDisponibles() != 0){
+
+                    $asientosDisponibles = $viaje->cantidadAsientosDisponibles();
+                    $pasajero = new Pasajero();
+                    $maxDocumento = $pasajero->maximoDocumento();
+    
+                    echo "Ingrese la cantidad de pasajes que desea vender: ";
+                    $cantPasajeros = (trim(fgets(STDIN)));
+                    echo "\n";
+                    if (!ctype_digit($cantPasajeros) || $cantPasajeros < 0 ){
+                        echo "ERROR: valor no válido para cantidad de pasajes\n";
+                        echo "Será redirigido al menú principal\n";
+                    } else if($cantPasajeros > $asientosDisponibles){
+                        echo "ERROR: la cantidad de pasajes ingresada para vender excede la capacidad máxima del viaje\n";
+                        echo "Será redirigido al menú principal\n";
+                    } else {
+                        $colAsientos = $viaje->arregloAsientosLibres();
+                        $colPasajeros = crearColeccionPasajerosAutomatica(
+                        $cantPasajeros, $colAsientos, $ultimoTicket, $idViaje);
+    
+                        $ultimoTicket += $cantPasajeros;
+                        $viaje->cargaColPasajeros($colPasajeros);
+                        echo "¡Venta automática de pasajes realizada con éxito!\n";
+                    }
                 } else {
-                    $colAsientos = $viaje->arregloAsientosLibres();
-                    $colPasajeros = crearColeccionPasajerosAutomatica(
-                    $cantPasajeros, $colAsientos, $ultimoTicket, $idViaje);
-
-                    $ultimoTicket += $cantPasajeros;
-                    $viaje->cargaColPasajeros($colPasajeros);
-                    echo "¡Venta automática de pasajes realizada con éxito!\n";
+                    echo "ERROR: Este viaje ya tiene todos sus pasajes vendidos\n";
+                    echo "Será redirigido al menú principal\n";
                 }
             } else {
                 echo "\n";
