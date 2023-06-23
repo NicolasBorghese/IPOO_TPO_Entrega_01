@@ -5,35 +5,169 @@ include_once "Pasajero.php";
 include_once "PasajeroEspecial.php";
 include_once "PasajeroVIP.php";
 include_once "Viaje.php";
+include_once "Empresa.php";
+include_once "BaseDatos.php";
+
+//Este programa no funciona si no está bien realizada la conexión con la base de datos
 
 /*/=======================================================================================\*\
-||                                         FUNCIONES                                       ||
+||                                   INICIO FUNCIONES                                      ||
 \*\=======================================================================================/*/
 
 /**
- * Imprime en pantalla un menú de opciones y 
- * retorna un entero que representa la opcion elegida
+ * En caso de que la base de datos no tenga cargada ninguna empresa accederá a
+ * este menú para crear una y empezar a operar con ella.
+ * Retorna la empresa cargada
  * 
+ * @param Empresa $empresaActiva
+ * 
+ * @return Empresa
+ */
+function sinEmpresasEnSistema($empresaActiva){
+    echo "\n";
+    echo "=====================================================================================\n";
+    echo "||          ATENCIÓN: La base de datos no encontró ninguna empresa cargada         ||\n";
+    echo "||                                                                                 ||\n";
+    echo "|| Ingrese los datos de la empresa para cargarla en la base de datos y así         ||\n";
+    echo "|| poder comenzar a operar con ella                                                ||\n";
+    echo "=====================================================================================\n";
+    echo "\n";
+    echo "Ingrese el nombre de la empresa: ";
+    $nombreEmpresa = trim(fgets(STDIN));
+    echo "Ingrese la dirección de la empresa: ";
+    $direccionEmpresa = trim(fgets(STDIN));
+    $empresaActiva->cargar("", $nombreEmpresa, $direccionEmpresa, []);
+    $empresaActiva->insertar();
+    echo "\n";
+
+    return $empresaActiva;
+}
+
+/**
+ * Menú principal que le indica al usuario las secciones a las que puede ir.
+ * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
  * @return int
  */
-function menuPrincipal(){
-    // int $opcionElegida
+function menuPrincipal($empresaActiva){
     do{
+        
         echo "=====================================================================================\n";
-        echo "||                              [Viaje Feliz]                                      ||\n";
+        echo mensajeBienvenida($empresaActiva);
         echo "||                                                                                 ||\n";
-        echo "||                              MENÚ PRINCIPAL                                     ||\n";
+        echo "||                                 MENÚ PRINCIPAL                                  ||\n";
         echo "||                                                                                 ||\n";
         echo "|| Ingrese por teclado el número que corresponda a la sección que desea ir:        ||\n";
         echo "||                                                                                 ||\n";
         echo "||---------------------------------------------------------------------------------||\n";
-        echo "|| [[1]] CREAR/MODIFICAR VIAJE (vender pasajes, asignar responsable ...)           ||\n";
+        echo "|| [1] EMPRESAS                                                                    ||\n";
         echo "||---------------------------------------------------------------------------------||\n";
-        echo "|| [[2]] OBSERVAR DATOS DEL VIAJE (ver pasajeros, ver destino ...)                 ||\n";
+        echo "|| [2] VIAJES                                                                      ||\n";
         echo "||---------------------------------------------------------------------------------||\n";
-        echo "|| [[3]] QUITAR/MODIFICAR PASAJEROS DEL VIAJE (cambiar nombre pasajero ...)        ||\n";
+        echo "|| [3] RESPONSABLES DE VIAJE                                                       ||\n";
         echo "||---------------------------------------------------------------------------------||\n";
-        echo "|| [[0]] FINALIZAR PROGRAMA                                                        ||\n";
+        echo "|| [4] PASAJEROS                                                                   ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [5] REINICIAR LA BASE DE DATOS                                                  ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [0] FINALIZAR PROGRAMA                                                          ||\n";
+        echo "=====================================================================================\n";
+        echo "\n";
+        echo "Indique la operación que desea realizar: ";
+        $opcionElegida = trim(fgets(STDIN));
+        
+        // OBSERVAR: el rango varía según cantidad de opciones
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 5){
+            mensajeFueraDeRango();
+        }
+    // OBSERVAR: el rango varía según cantidad de opciones
+    } while ($opcionElegida < 0 || $opcionElegida > 5);
+    echo "\n";
+    return $opcionElegida;
+}
+
+/*/=======================================================================================\*\
+||                                    MENÚS EMPRESAS                                       ||
+\*\=======================================================================================/*/
+
+/**
+ * Menú general de empresa que le indica al usuario las operaciones que puede realizar respecto
+ * a la empresa.
+ * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
+ * @return int
+ */
+function menuGeneralEmpresa($empresaActiva){
+    do{
+
+        echo "=====================================================================================\n";
+        echo mensajeBienvenida($empresaActiva);
+        echo "||                                                                                 ||\n";
+        echo "||                             MENÚ GENERAL DE EMPRESA                             ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
+        echo "|| realizar:                                                                       ||\n";
+        echo "||                                                                                 ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [1] Crear una nueva empresa                                                     ||\n";
+        echo "|| [2] Visualizar información completa de la empresa activa                        ||\n";
+        echo "|| [3] Modificar datos de la empresa activa/ Eliminar                              ||\n";
+        echo "|| [4] Cambiar a otra empresa                                                      ||\n";
+        echo "|| [5] Visualizar IDs de viajes de la empresa activa                               ||\n";
+        echo "|| [6] Visualizar IDs de todos los responsables en el sistema                      ||\n";
+        echo "|| [7] Visualizar IDs de empresas en el sistema                                    ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
+        echo "=====================================================================================\n";
+        echo "\n";
+        echo "Indique la operación que desea realizar: ";
+        $opcionElegida = trim(fgets(STDIN));
+
+        // OBSERVAR: el rango varía según cantidad de opciones
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 7){
+            mensajeFueraDeRango();
+        }
+    // OBSERVAR: el rango varía según cantidad de opciones
+    } while ($opcionElegida < 0 || $opcionElegida > 7);
+    echo "\n";
+    return $opcionElegida;
+}
+
+/**
+ * Menú para modificar datos de la empresa
+ * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
+ * @return int
+ */
+function menuModificarEmpresa($empresaActiva){
+    do{
+
+        echo "=====================================================================================\n";
+        echo mensajeBienvenida($empresaActiva);
+        echo "||                                                                                 ||\n";
+        echo "||                   MENÚ DE MODIFICACIÓN DE DATOS DE LA EMPRESA                   ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
+        echo "|| realizar:                                                                       ||\n";
+        echo "||                                                                                 ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [1] Modificar el nombre de la empresa                                           ||\n";
+        echo "|| [2] Modificar la dirección de la empresa                                        ||\n";
+        echo "|| [3] Eliminar empresa                                                            ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
         echo "=====================================================================================\n";
         echo "\n";
         echo "Indique la operación que desea realizar: ";
@@ -46,80 +180,90 @@ function menuPrincipal(){
     // OBSERVAR: el rango varía según cantidad de opciones
     } while ($opcionElegida < 0 || $opcionElegida > 3);
     echo "\n";
-    return $opcionElegida;  
+    return $opcionElegida;
 }
 
+/*/=======================================================================================\*\
+||                                     MENÚS VIAJES                                        ||
+\*\=======================================================================================/*/
+
 /**
- * Imprime en pantalla un menú de opciones y 
- * retorna un entero que representa la opcion elegida
+ * Menú general de viajes que le indica al usuario las operaciones que puede realizar respecto
+ * de los viajes de la empresa.
  * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
  * @return int
  */
-function menuModificarViaje(){
-    // int $opcionElegida
+function menuGeneralViajes($empresaActiva){
     do{
+
         echo "=====================================================================================\n";
-        echo "||                              [Viaje Feliz]                                      ||\n";
+        echo mensajeBienvenida($empresaActiva);
         echo "||                                                                                 ||\n";
-        echo "||                      MENÚ PARA CREAR/MODIFICAR VIAJE                            ||\n";
+        echo "||                              MENÚ GENERAL DE VIAJES                             ||\n";
         echo "||                                                                                 ||\n";
         echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
         echo "|| realizar:                                                                       ||\n";
         echo "||                                                                                 ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
         echo "|| [1] Crear un viaje nuevo                                                        ||\n";
-        echo "|| [2] Vender un pasaje del viaje a un pasajero                                    ||\n";
-        echo "|| [3] Asignar una nueva colección de pasajeros al viaje (reemplaza la actual)     ||\n";
-        echo "|| [4] Asignar un nuevo responsable de viaje                                       ||\n";
-        echo "|| [5] modificar responsable de viaje actual                                       ||\n";
-        echo "|| [6] Modificar el destino del viaje                                              ||\n";
-        echo "|| [7] Modificar la cantidad máxima permitida de pasajeros para el viaje           ||\n";
-        echo "|| [8] Modificar el costo de pasaje para el viaje                                  ||\n";
-        echo "||---------------------------------------------------------------------------------||\n";
-        echo "|| [0] VOLVER AL MENÚ PRINCIPAL                                                    ||\n";
+        echo "|| [2] Visualizar datos de un viaje                                                ||\n";
+        echo "|| [3] Modificar datos de un viaje/ Eliminar                                       ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
         echo "=====================================================================================\n";
         echo "\n";
         echo "Indique la operación que desea realizar: ";
         $opcionElegida = trim(fgets(STDIN));
         
         // OBSERVAR: el rango varía según cantidad de opciones
-        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 8){
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 3){
             mensajeFueraDeRango();
         }
     // OBSERVAR: el rango varía según cantidad de opciones
-    } while (!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 8);
+    } while ($opcionElegida < 0 || $opcionElegida > 3);
     echo "\n";
-    return $opcionElegida;  
+    return $opcionElegida;
 }
 
 /**
- * Imprime en pantalla un menú de opciones y 
- * retorna un entero que representa la opcion elegida
+ * Menú para visualizar datos del viaje
  * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
  * @return int
  */
-function menuObservarViaje(){
-    // int $opcionElegida
+function menuVisualizarViaje($empresaActiva){
     do{
+
         echo "=====================================================================================\n";
-        echo "||                              [Viaje Feliz]                                      ||\n";
+        echo mensajeBienvenida($empresaActiva);
         echo "||                                                                                 ||\n";
-        echo "||                     MENÚ PARA OBSERVAR DATOS DEL VIAJE                          ||\n";
+        echo "||                     MENÚ DE VISUALIZACIÓN DE DATOS DE VIAJES                    ||\n";
         echo "||                                                                                 ||\n";
         echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
         echo "|| realizar:                                                                       ||\n";
         echo "||                                                                                 ||\n";
-        echo "|| [1] Visualizar la información completa del viaje                                ||\n";
-        echo "|| [2] Visualizar la colección del pasajeros                                       ||\n";
-        echo "|| [3] Visualizar el código del viaje                                              ||\n";
-        echo "|| [4] Visualizar el destino del viaje                                             ||\n";
-        echo "|| [5] Visualizar la cantidad máxima de pasajeros permitida                        ||\n";
-        echo "|| [6] Visualizar al responsable del viaje                                         ||\n";
-        echo "|| [7] Visualizar el costo por pasaje del viaje                                    ||\n";
-        echo "|| [8] Visualizar la recaudación total actual del viaje                            ||\n";
-        echo "|| [9] Visualizar los asientos libres                                              ||\n";
-        echo "|| [10] Visualizar la cantidad de asientos disponibles                             ||\n";
         echo "||---------------------------------------------------------------------------------||\n";
-        echo "|| [0] VOLVER AL MENÚ PRINCIPAL                                                    ||\n";
+        echo "|| [1] Mostrar los datos del viaje completo                                        ||\n";
+        echo "|| [2] Mostrar la colección de pasajeros                                           ||\n";
+        echo "|| [3] Mostrar el código de viaje                                                  ||\n";
+        echo "|| [4] Mostrar el destino                                                          ||\n";
+        echo "|| [5] Mostrar la cantidad máxima permitida de pasajeros                           ||\n";
+        echo "|| [6] Mostrar al responsable del viaje                                            ||\n";
+        echo "|| [7] Mostrar el costo del pasaje                                                 ||\n";
+        echo "|| [8] Mostrar la recaudación total                                                ||\n";
+        echo "|| [9] Mostrar los asientos disponibles                                            ||\n";
+        echo "|| [10] Mostrar la cantidad de asientos disponibles                                ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
         echo "=====================================================================================\n";
         echo "\n";
         echo "Indique la operación que desea realizar: ";
@@ -130,53 +274,316 @@ function menuObservarViaje(){
             mensajeFueraDeRango();
         }
     // OBSERVAR: el rango varía según cantidad de opciones
-    } while (!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 10);
+    } while ($opcionElegida < 0 || $opcionElegida > 10);
     echo "\n";
-    return $opcionElegida;  
+    return $opcionElegida;
 }
 
 /**
- * Imprime en pantalla un menú de opciones y 
- * retorna un entero que representa la opcion elegida
+ * Menú para modificar datos del viaje
  * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
  * @return int
  */
-function menuModificarPasajero(){
-    // int $opcionElegida
+function menuModificarViaje($empresaActiva){
     do{
+
         echo "=====================================================================================\n";
-        echo "||                              [Viaje Feliz]                                      ||\n";
+        echo mensajeBienvenida($empresaActiva);
         echo "||                                                                                 ||\n";
-        echo "||               MENÚ PARA QUITAR/MODIFICAR PASAJEROS DEL VIAJE                    ||\n";
+        echo "||                     MENÚ DE MODIFICACIÓN DE DATOS DE VIAJES                     ||\n";
         echo "||                                                                                 ||\n";
         echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
         echo "|| realizar:                                                                       ||\n";
         echo "||                                                                                 ||\n";
-        echo "|| [1] Quitar un pasajero del viaje                                                ||\n";
-        echo "|| [2] Quitar todos los pasajeros del viaje                                        ||\n";
-        echo "|| [3] Modificar el nombre de un pasajero                                          ||\n";
-        echo "|| [4] Modificar el apellido de un pasajero                                        ||\n";
-        echo "|| [5] Modificar el número de teléfono de un pasajero                              ||\n";
-        echo "|| [6] Modificar el número de asiento de un pasajero                               ||\n";
-        echo "|| [7] Modificar campos de un pasajero especial                                    ||\n";
-        echo "|| [8] Modificar campos de un pasajero VIP                                         ||\n";
-        echo "|| [9] Visualizar pasajero por número de documento                                 ||\n";
-        echo "|| [10] Visualizar pasajero por número de asiento                                  ||\n";
         echo "||---------------------------------------------------------------------------------||\n";
-        echo "|| [0] VOLVER AL MENÚ PRINCIPAL                                                    ||\n";
+        echo "|| [1] Modificar el destino                                                        ||\n";
+        echo "|| [2] Modificar la cantidad máxima permitida de pasajeros                         ||\n";
+        echo "|| [3] Asignar un nuevo responsable de viaje                                       ||\n";
+        echo "|| [4] Modificar el costo del pasaje                                               ||\n";
+        echo "|| [5] Quitar todos los pasajeros del viaje                                        ||\n";
+        echo "|| [6] Eliminar viaje                                                              ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
         echo "=====================================================================================\n";
         echo "\n";
         echo "Indique la operación que desea realizar: ";
         $opcionElegida = trim(fgets(STDIN));
         
         // OBSERVAR: el rango varía según cantidad de opciones
-        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 10){
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 6){
             mensajeFueraDeRango();
         }
     // OBSERVAR: el rango varía según cantidad de opciones
-    } while (!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 10);
+    } while ($opcionElegida < 0 || $opcionElegida > 6);
     echo "\n";
-    return $opcionElegida;  
+    return $opcionElegida;
+}
+
+/*/=======================================================================================\*\
+||                                  MENÚS RESPONSABLES                                     ||
+\*\=======================================================================================/*/
+
+/**
+ * Menú general de responsables que le indica al usuario las operaciones que puede realizar respecto
+ * de los responsables de la empresa.
+ * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
+ * @return int
+ */
+function menuGeneralResponsables($empresaActiva){
+    do{
+
+        echo "=====================================================================================\n";
+        echo mensajeBienvenida($empresaActiva);
+        echo "||                                                                                 ||\n";
+        echo "||                           MENÚ GENERAL DE RESPONSABLES                          ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
+        echo "|| realizar:                                                                       ||\n";
+        echo "||                                                                                 ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [1] Crear un responsable nuevo                                                  ||\n";
+        echo "|| [2] Visualizar datos de un responsable                                          ||\n";
+        echo "|| [3] Modificar datos de un responsable                                           ||\n";
+        echo "|| [4] Eliminar responsable                                                        ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
+        echo "=====================================================================================\n";
+        echo "\n";
+        echo "Indique la operación que desea realizar: ";
+        $opcionElegida = trim(fgets(STDIN));
+
+        // OBSERVAR: el rango varía según cantidad de opciones
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 4){
+            mensajeFueraDeRango();
+        }
+    // OBSERVAR: el rango varía según cantidad de opciones
+    } while ($opcionElegida < 0 || $opcionElegida > 4);
+    echo "\n";
+    return $opcionElegida;
+}
+
+/**
+ * Menú para visualizar datos del responsable
+ * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
+ * @return int
+ */
+function menuVisualizarResponsable($empresaActiva){
+    do{
+
+        echo "=====================================================================================\n";
+        echo mensajeBienvenida($empresaActiva);
+        echo "||                                                                                 ||\n";
+        echo "||                  MENÚ DE VISUALIZACIÓN DE DATOS DEL RESPONSABLE                 ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
+        echo "|| realizar:                                                                       ||\n";
+        echo "||                                                                                 ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [1] Mostrar todos los datos del responsable                                     ||\n";
+        echo "|| [2] Mostrar número de empleado                                                  ||\n";
+        echo "|| [3] Mostrar número de licencia                                                  ||\n";
+        echo "|| [4] Mostrar el nombre                                                           ||\n";
+        echo "|| [5] Mostrar el apellido                                                         ||\n";
+        echo "|| [6] Mostrar todos los viajes a los que se encuentra asignado                    ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
+        echo "=====================================================================================\n";
+        echo "\n";
+        echo "Indique la operación que desea realizar: ";
+        $opcionElegida = trim(fgets(STDIN));
+        
+        // OBSERVAR: el rango varía según cantidad de opciones
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 6){
+            mensajeFueraDeRango();
+        }
+    // OBSERVAR: el rango varía según cantidad de opciones
+    } while ($opcionElegida < 0 || $opcionElegida > 6);
+    echo "\n";
+    return $opcionElegida;
+}
+
+/*/=======================================================================================\*\
+||                                   MENÚS PASAJEROS                                       ||
+\*\=======================================================================================/*/
+
+/**
+ * Menú general de pasajeros que le indica al usuario las operaciones que puede realizar respecto
+ * de los pasajeros de la empresa.
+ * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
+ * @return int
+ */
+function menuGeneralPasajeros($empresaActiva){
+    do{
+
+        echo "=====================================================================================\n";
+        echo mensajeBienvenida($empresaActiva);
+        echo "||                                                                                 ||\n";
+        echo "||                            MENÚ GENERAL DE PASAJEROS                            ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
+        echo "|| realizar:                                                                       ||\n";
+        echo "||                                                                                 ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [1] Vender pasajes                                                              ||\n";
+        echo "|| [2] Visualizar datos de un pasajero                                             ||\n";
+        echo "|| [3] Modificar datos de un pasajero/ Quitar pasajero del viaje                   ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
+        echo "=====================================================================================\n";
+        echo "\n";
+        echo "Indique la operación que desea realizar: ";
+        $opcionElegida = trim(fgets(STDIN));
+        
+        // OBSERVAR: el rango varía según cantidad de opciones
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 3){
+            mensajeFueraDeRango();
+        }
+    // OBSERVAR: el rango varía según cantidad de opciones
+    } while ($opcionElegida < 0 || $opcionElegida > 3);
+    echo "\n";
+    return $opcionElegida;
+}
+
+/**
+ * Menú para vender pasajes
+ * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
+ * @return int
+ */
+function menuVenderPasajes($empresaActiva){
+    do{
+
+        echo "=====================================================================================\n";
+        echo mensajeBienvenida($empresaActiva);
+        echo "||                                                                                 ||\n";
+        echo "||                             MENÚ DE VENTA DE PASAJES                            ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
+        echo "|| realizar:                                                                       ||\n";
+        echo "||                                                                                 ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [1] Realizar una venta manual de un pasaje                                      ||\n";
+        echo "|| [2] Realizar una venta automática de varios pasajes                             ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
+        echo "=====================================================================================\n";
+        echo "\n";
+        echo "Indique la operación que desea realizar: ";
+        $opcionElegida = trim(fgets(STDIN));
+        
+        // OBSERVAR: el rango varía según cantidad de opciones
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 2){
+            mensajeFueraDeRango();
+        }
+    // OBSERVAR: el rango varía según cantidad de opciones
+    } while ($opcionElegida < 0 || $opcionElegida > 2);
+    echo "\n";
+    return $opcionElegida;
+}
+
+/**
+ * Menú para modificar pasajero
+ * 
+ * Recibe por parámetro la empresa con la que se está operando para generar
+ * un saludo personalizado.
+ * @param Empresa $empresaActiva
+ * 
+ * Retorna un entero que indica la opción del menú elegida
+ * @return int
+ */
+function menuModificarPasajero($empresaActiva){
+    do{
+
+        echo "=====================================================================================\n";
+        echo mensajeBienvenida($empresaActiva);
+        echo "||                                                                                 ||\n";
+        echo "||                        MENÚ DE MODIFICACIÓN DE PASAJEROS                        ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| Ingrese por teclado el número que corresponda a la operación que desea          ||\n";
+        echo "|| realizar:                                                                       ||\n";
+        echo "||                                                                                 ||\n";
+        echo "||---------------------------------------------------------------------------------||\n";
+        echo "|| [1] Quitar el pasajero del viaje                                                ||\n";
+        echo "|| [2] Modificar el nombre del pasajero                                            ||\n";
+        echo "|| [3] Modificar el apellido del pasajero                                          ||\n";
+        echo "|| [4] Modificar el número de teléfono del pasajero                                ||\n";
+        echo "|| [5] Modificar el número de asiento del pasajero                                 ||\n";
+        echo "|| [6] Modificar campos de pasajero especial                                       ||\n";
+        echo "|| [7] Modificar campos de pasajero VIP                                            ||\n";
+        echo "||                                                                                 ||\n";
+        echo "|| [0] Volver al menú principal                                                    ||\n";
+        echo "=====================================================================================\n";
+        echo "\n";
+        echo "Indique la operación que desea realizar: ";
+        $opcionElegida = trim(fgets(STDIN));
+        
+        // OBSERVAR: el rango varía según cantidad de opciones
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 7){
+            mensajeFueraDeRango();
+        }
+    // OBSERVAR: el rango varía según cantidad de opciones
+    } while ($opcionElegida < 0 || $opcionElegida > 7);
+    echo "\n";
+    return $opcionElegida;
+}
+
+/*/=======================================================================================\*\
+||                                FUNCIONES DE INTERFAZ                                    ||
+\*\=======================================================================================/*/
+
+/**
+ * Genera un mensaje de bienvenida personalizado para los menús según el nombre
+ * de la empresa que se encuentre activa.
+ * 
+ * @param Empresa $empresaActiva
+ * @return string
+ */
+function mensajeBienvenida($empresaActiva){
+
+    $parte1 = "||                                  ";
+    $parte2 = "Bienvenido a: ";
+    $parte3 = $empresaActiva->getNombreEmpresa();
+    $parte4 = "                                 ||\n";
+
+    $longitud = strlen($parte3);
+    $mitad1 = round($longitud/2);
+    $mitad2 = floor($longitud/2);
+    
+    $parte1 = substr($parte1, 0, (strlen($parte1)-$mitad1));
+    $parte4 = substr($parte4, $mitad2);
+
+    if($mitad1 > 34 ){
+        $parte1 = "||";
+        $parte3 = $parte3."\n";
+    }
+
+    $mensajeBienvenida = $parte1.$parte2.$parte3.$parte4;
+
+    return $mensajeBienvenida;
 }
 
 /**
@@ -210,6 +617,171 @@ function detenerEjecucion(){
     }while ($presionarEnter != "");
 
     echo "\n";
+}
+
+/*/=======================================================================================\*\
+||                                 FUNCIONES GENERALES                                     ||
+\*\=======================================================================================/*/
+
+/**
+ * Retorna un string que muestra todos los IDs de Viajes correspondientes a la empresa
+ * recibida por parámetro.
+ * 
+ * @param Empresa $empresaActiva
+ * @return string
+ */
+function visualizarIDsViajes($empresaActiva){
+
+    $idEmpresa = $empresaActiva->getIdEmpresa();
+    $nombreEmpresa = $empresaActiva->getNombreEmpresa();
+    $viaje = new Viaje();
+    $colViajes = $viaje->listar("viaje.idempresa = ".$idEmpresa);
+
+    if(count($colViajes) == 0){
+        $cadena = "[Esta empresa no tiene viajes cargados en la base de datos]\n";
+    } else {
+        $cadena = "IDs de viajes correspondientes a la empresa activa [ID empresa: ".$idEmpresa."][Nombre: ".$nombreEmpresa."]\n";
+        for($i = 0; $i < count($colViajes); $i++){
+            $cadena = $cadena."[ID viaje: ".$colViajes[$i]->getCodigo() ."][Destino: ".$colViajes[$i]->getDestino()."]\n";
+        }
+    }
+    return $cadena;
+}
+
+/**
+ * Retorna un string que muestra todos los IDs de los responsables cargados en la base de datos.
+ * 
+ * @return string
+ */
+function visualizarIDsResponsables(){
+
+    $responsable = new ResponsableV();
+    $colResponsables = $responsable->listar("");
+
+    if(count($colResponsables) == 0){
+        $cadena = "[Este sistema no tiene responsables cargados en la base de datos]\n";
+    } else {
+        $cadena = "IDs de responsables en sistema:\n";
+        for($i = 0; $i < count($colResponsables); $i++){
+            $cadena = $cadena."[ID responsable: ".$colResponsables[$i]->getNumeroEmpleado() .
+            "][Nombre: ".$colResponsables[$i]->getNombre()."][Apellido: ".$colResponsables[$i]->getApellido()."]\n";
+        }
+    }
+    return $cadena;
+}
+
+/**
+ * Retorna un string que muestra todos los IDs de las empresas cargadas en la base de datos
+ * 
+ * @return string
+ */
+function visualizarIDsEmpresas(){
+
+    $empresa = new Empresa();
+    $colEmpresas = $empresa->listar("");
+
+    if(count($colEmpresas) == 0){
+        $cadena = "[Este sistema no tiene Empresas cargadas en la base de datos]\n";
+    } else {
+        $cadena = "IDs de empresas en sistema:\n";
+        for($i = 0; $i < count($colEmpresas); $i++){
+            $cadena = $cadena."[ID empresa: ".$colEmpresas[$i]->getIdEmpresa().
+            "][Nombre: ".$colEmpresas[$i]->getNombreEmpresa()."]\n";
+        }
+    }
+    return $cadena;
+}
+
+/**
+ * Recibe por parámetro el id de un responsable y retorna un string
+ * que indica a que viajes se encuentra asignado.
+ * 
+ * @param int $idResponsable
+ * @return string
+ */
+function visualizarViajesResponsable($idResponsable){
+
+    $viaje = new Viaje();
+    $colViajes = $viaje->listar("rnumeroempleado = ".$idResponsable);
+
+    if (count($colViajes) == 0){
+        $cadena = "El responsable [ID: ".$idResponsable."] no se encuentra asignado a ningún viaje\n";
+
+    } else {
+        $cadena = "El responsable [ID: ".$idResponsable."] se encuentra asignado a los siguientes viajes:\n";
+
+        for ($i = 0; $i < count($colViajes); $i++){
+            $cadena = $cadena. "[ID viaje: ".$colViajes[$i]->getCodigo()."]";
+            $cadena = $cadena. "[Destino: ".$colViajes[$i]->getDestino()."]";
+            $cadena = $cadena. "[ID Empresa: ".$colViajes[$i]->getEmpresa()->getIdEmpresa()."]";
+            $cadena = $cadena. "[Nombre Empresa: ".$colViajes[$i]->getEmpresa()->getNombreEmpresa()."]\n";
+        }
+    }
+    return $cadena;
+}
+
+/**
+ * Crea un viaje nuevo y lo guarda en la base de datos
+ * 
+ * @param int $idEmpresa
+ */
+function crearViaje($idEmpresa){
+
+    echo "Ingrese el destino del nuevo viaje: ";
+    $destino = trim(fgets(STDIN));
+
+    do{
+        $permitido = true;
+        echo "Ingrese la capacidad máxima de pasajeros para el nuevo viaje: ";
+        $cantMaxPasajeros = trim(fgets(STDIN));
+        if(!ctype_digit($cantMaxPasajeros) || $cantMaxPasajeros < 0){
+            $permitido = false;
+            echo "ERROR: valor ingresado para capacidad máxima inválido\n";
+        }
+    }while(!$permitido);
+    $cantMaxPasajeros = (int)$cantMaxPasajeros;
+
+    echo "\n";
+    echo visualizarIDsResponsables();
+    echo "\n";
+
+    echo "Ingrese el número de empleado de quien será el responsable para este viaje: ";
+    $idResponsable = trim(fgets(STDIN));
+
+    $responsable = new ResponsableV();
+    $permitido = $responsable->Buscar($idResponsable);
+
+    if($permitido){
+        do{
+            $permitido = true;
+            echo "Ingrese el costo de pasaje para el viaje: $";
+            $costo = trim(fgets(STDIN));
+            if(!is_numeric($costo) || $costo < 0){
+                $permitido = false;
+                echo "ERROR: valor ingresado para costo de pasaje inválido\n";
+            }
+        }while(!$permitido);
+        $costo = (float)$costo;
+
+        $empresa = new Empresa();
+        $empresa->Buscar($idEmpresa);
+
+        $viaje = new Viaje();
+        $viaje->cargar("", $destino, $cantMaxPasajeros, [], $responsable, $empresa, $costo);
+        $exito = $viaje->insertar();
+
+        echo "\n";
+        if($exito){  
+            echo "¡Viaje creado con éxito!\n";
+        } else {
+            $error = $viaje->getMensajeOperacion();
+            echo $error;
+        }
+    } else {
+        echo "\n";
+        echo "ERROR: No se designo un responsable válido, será redirigido al menú principal\n";
+    }
+        
 }
 
 /**
@@ -445,16 +1017,20 @@ function generaApellido($numero){
 
 /**
  * Pide los datos para crear un pasajero, recibe el último número de ticket
+ * y el id del viaje que se le desea vender
  * y retorna un objeto de tipo Pasajero
  * 
+ * @param int $idViaje
  * @param int $ultimoTicket
  * 
  * @return Pasajero
  */
-function crearPasajero($ultimoTicket){
+function crearPasajero($idViaje, $ultimoTicket){
     //boolean $permitido, $servicioSilla, $servicioAsistencia, $servicioComida
     //string $nombre, $apellido, $documento, $telefono
     //int $numeroAsiento, $numeroTicket, $opcionElegida, $nroViajeroFrecuente, $cantMillas
+    $pasajero = null;
+
     echo "A continuación ingrese los datos del pasajero\n\n";
 
     echo "Nombre del pasajero: ";
@@ -499,7 +1075,8 @@ function crearPasajero($ultimoTicket){
 
         switch($opcionElegida){
             case 1:
-                $pasajero = new Pasajero($nombre, $apellido, $documento, $telefono, $numeroAsiento, $ultimoTicket);
+                $pasajero = new Pasajero();
+                $pasajero->cargar($nombre, $apellido, $documento, $telefono, $numeroAsiento, $ultimoTicket, $idViaje);
                 break;
             case 2:
                 echo "Ingrese su número de viajero frecuente: ";
@@ -514,8 +1091,9 @@ function crearPasajero($ultimoTicket){
                     }
                 } while (!$permitido);
                 $cantMillas = (int)$cantMillas;
-                $pasajero = new PasajeroVIP($nombre, $apellido, $documento, $telefono, 
-                $numeroAsiento, $ultimoTicket, $nroViajeroFrecuente, $cantMillas);
+                $pasajero = new PasajeroVIP();
+                $pasajero->cargarSub($nombre, $apellido, $documento, $telefono, 
+                $numeroAsiento, $ultimoTicket, $idViaje, $nroViajeroFrecuente, $cantMillas);
                 break;
             case 3:
                 echo "Ingrese \"SI\" para los servicios que desea contratar\n";
@@ -541,11 +1119,12 @@ function crearPasajero($ultimoTicket){
                 }
 
                 if(!$reqSilla && !$reqAsistencia && !$reqComida){
-                    $pasajero = new Pasajero($nombre, $apellido, $documento, $telefono, 
-                    $numeroAsiento, $ultimoTicket);
+                    $pasajero = new Pasajero();
+                    $pasajero->cargar($nombre, $apellido, $documento, $telefono, $numeroAsiento, $ultimoTicket, $idViaje);
                 } else {
-                    $pasajero = new PasajeroEspecial($nombre, $apellido, $documento, $telefono, 
-                    $numeroAsiento, $ultimoTicket, $reqSilla, $reqAsistencia, $reqComida);
+                    $pasajero = new PasajeroEspecial();
+                    $pasajero->cargarSub($nombre, $apellido, $documento, $telefono, 
+                    $numeroAsiento, $ultimoTicket, $idViaje, $reqSilla, $reqAsistencia, $reqComida);
                 }
 
                 break;
@@ -561,14 +1140,9 @@ function crearPasajero($ultimoTicket){
 }
 
 /**
- * Pide los datos para crear un responsable y retorna un objeto de tipo ResponsableV
- * Recibe un número de empleado
- * 
- * @param int $numeroEmpleado
- * 
- * @return ResponsableV
+ * Pide los datos para crear un responsable y si es posible lo inserta en la base de datos
  */
-function crearResponsable($numeroEmpleado){
+function crearResponsable(){
     //ResponsableV $responsable
     //string $nombre, $apellido, 
     //int $numeroEmpleado, $numeroLicencia
@@ -581,34 +1155,33 @@ function crearResponsable($numeroEmpleado){
     echo "Número de licencia: ";
     $numeroLicencia = trim(fgets(STDIN));
 
-    $responsable = new ResponsableV($numeroEmpleado, $numeroLicencia, $nombre, $apellido);
-    
-    return $responsable;
+    $responsable = new ResponsableV();
+    $responsable->cargar(null, $numeroLicencia, $nombre, $apellido);
+    $responsable->insertar();
+
 }
 
 /**
  * Crea un arreglo automático de pasajeros y lo retorna
- * Recibe la cantidad de pasajeros que se desean crear, la cantidad de asientos que pueden ocupar
- * y el número del último ticket generado
  * 
  * @param int $cantPasajeros
- * @param int $cantAsientos
+ * @param array $colAsientos
+ * @param string $maxDocumento
  * @param int $ultimoTicket
+ * @param int $idViaje
  * 
  * @return array $colPasajeros
  */
-function crearColeccionPasajerosAutomatica($cantPasajeros, $cantAsientos, $ultimoTicket){
+function crearColeccionPasajerosAutomatica($cantPasajeros, $colAsientos, $ultimoTicket, $idViaje){
     // array $colPasajeros, $colAsientos
     // string $nombre, $apellido, $numeroAsiento, $tipoPasajero, $telefono
     // int $documento, $reqSila, $reqAsistencia, $reqComida, $nroViajeroFrecuente
     // boolean $reqSilla, $reqAsistencia, $reqComida
 
     $colPasajeros = [];
-    $colAsientos = [];
 
-    for ($j=0; $j < $cantAsientos; $j++){
-        $colAsientos[$j] = $j+1;
-    }
+    $pasajero = new Pasajero();
+    $maxDocumento = $pasajero->maximoDocumento();
 
     for ($i = 0; $i < $cantPasajeros; $i++){
 
@@ -619,9 +1192,9 @@ function crearColeccionPasajerosAutomatica($cantPasajeros, $cantAsientos, $ultim
         }
         $apellido = generaApellido(random_int(1,20));
         
-        $documento = 1000 + $i+1;
+        $documento = $maxDocumento + ($i+1);
         
-        $telefono = random_int(100, 799)." ". random_int(500, 599) ." ". 1000+$i;
+        $telefono = (random_int(100, 799)*10000) + (1000+$i);
 
         $asientoAleatorio = random_int(0, count($colAsientos)-1);
         $numeroAsiento = $colAsientos[$asientoAleatorio];
@@ -635,8 +1208,13 @@ function crearColeccionPasajerosAutomatica($cantPasajeros, $cantAsientos, $ultim
         if($tipoPasajero == 1){
             $nroViajeroFrecuente = random_int(1000, 9999);
             $cantMillas = random_int(10, 1000);
-            $colPasajeros[$i] = new PasajeroVIP($nombre, $apellido, $documento,
-            $telefono, $numeroAsiento, $ultimoTicket, $nroViajeroFrecuente, $cantMillas);
+            $cantMillas = (int)$cantMillas;
+
+            $colPasajeros[$i] = new PasajeroVIP();
+            $colPasajeros[$i]->cargar($nombre, $apellido, $documento,
+            $telefono, $numeroAsiento, $ultimoTicket, $idViaje, $nroViajeroFrecuente, $cantMillas);
+            $colPasajeros[$i]->insertar();
+
         }else if($tipoPasajero == 2 || $tipoPasajero == 3){
             if(random_int(1, 3) == 1){
                 $reqSilla = true;
@@ -656,11 +1234,19 @@ function crearColeccionPasajerosAutomatica($cantPasajeros, $cantAsientos, $ultim
             if(!$reqSilla && !$reqAsistencia && !$reqComida){
                 $reqComida = true;
             }
-            $colPasajeros[$i] = new PasajeroEspecial($nombre, $apellido, $documento,
-            $telefono, $numeroAsiento, $ultimoTicket, $reqSilla, $reqAsistencia, $reqComida);
+
+            $colPasajeros[$i] = new PasajeroEspecial();
+            $colPasajeros[$i]->cargar($nombre, $apellido, $documento,
+            $telefono, $numeroAsiento, $ultimoTicket, $idViaje, $reqSilla, $reqAsistencia, $reqComida);
+            $colPasajeros[$i]->insertar();
+
         }else{
-            $colPasajeros[$i] = new Pasajero($nombre, $apellido, $documento,
-            $telefono, $numeroAsiento, $ultimoTicket);
+
+            $colPasajeros[$i] = new Pasajero();
+            $colPasajeros[$i]->cargar($nombre, $apellido, $documento,
+            $telefono, $numeroAsiento, $ultimoTicket, $idViaje);
+            $colPasajeros[$i]->insertar();
+
         }
     }
 
@@ -671,91 +1257,743 @@ function crearColeccionPasajerosAutomatica($cantPasajeros, $cantAsientos, $ultim
 ||                                    PROGRAMA PRINCIPAL                                   ||
 \*\=======================================================================================/*/
 
-/**
- * Viaje $viaje
- * ResponsableV $responsable
- * Pasajero $pasajero
- * int $codigo, $cantMaxPasajeros, $cantPasajeros, $documento, $opcionMenuPrincipal, $opcionMenuOperaciones
- * $ultimoTicket, $cantMillas, $numeroEmpleado
- * float $costo
- * string $destino, $nombre, $apellido, $numeroTelefono, $nroViajeroFrecuente, $numeroLicencia
- * array $colPasajeros
- * boolean $esPosible, $permitido, $servicioSilla, $servicioAsistencia, $servicioComida
- */
+//INICIO EJECUCIÓN DE PROGRAMA
+$empresaActiva = new Empresa();
+$colEmpresas = $empresaActiva->listar("");
+if(count($colEmpresas) == 0){
+    $empresaActiva = sinEmpresasEnSistema($empresaActiva);
+} else {
+    $empresaActiva = $colEmpresas[0];
+}
+$empresaActiva->actualizarColViajes();
 
-$numeroEmpleado = 997;
-$responsable = new ResponsableV($numeroEmpleado, 31721, "Nicolás", "Borghese");
+$pasajero = new Pasajero();
+$maxDocumento = $pasajero->maximoDocumento();
+$ultimoTicket = $pasajero->maximoTicket();
 
-$cantPasajeros = 10;
-$cantMaxPasajeros = 20;
-$ultimoTicket = 19000;
-$colPasajeros = crearColeccionPasajerosAutomatica($cantPasajeros, $cantMaxPasajeros, $ultimoTicket);
-$ultimoTicket += $cantPasajeros;
-
-$viaje = new Viaje(1001, "Plottier", $cantMaxPasajeros, $colPasajeros, $responsable, 100);
+$menuActivo = "Principal";
+//FIN INICIO EJECUCIÓN DE PROGRAMA
 
 echo "\n";
-echo "=====================================================================================\n";
-echo "|| El programa cuenta con un primer viaje precargado                               ||\n";
-echo "=====================================================================================\n";
-echo "\n";
 
+//CICLO DE OPERACIONES
 do {
 
-    $opcionMenuPrincipal = menuPrincipal();
+    $colEmpresas = $empresaActiva->listar("");
+    if(count($colEmpresas) == 0){
+        $empresaActiva = sinEmpresasEnSistema($empresaActiva);
+        $colEmpresas = $empresaActiva->listar("");
+        $empresaActiva = $colEmpresas[0];
+        $empresaActiva->actualizarColViajes();
+    }
+    
+    if($menuActivo == "Principal"){
+        $opcionMenu = menuPrincipal($empresaActiva);
 
-    switch ($opcionMenuPrincipal){
-        // [[1]] MENÚ PARA CREAR/MODIFICAR VIAJE
-        case 1:
-            $opcionMenuOperaciones = menuModificarViaje();
-            switch($opcionMenuOperaciones){
-                // 1 [1] Crear un viaje nuevo
-                case 1:
-                    echo "Ingrese el código correspondiente al nuevo viaje: ";
-                    $codigo = trim(fgets(STDIN));
-                    echo "Ingrese el destino del nuevo viaje: ";
-                    $destino = trim(fgets(STDIN));
+        switch($opcionMenu){
+            // [1] EMPRESAS
+            case 1:
+                $menuActivo = "GeneralEmpresa";
+                break;
+            // [2] VIAJES
+            case 2:
+                $menuActivo = "GeneralViajes";
+                break;
+            // [3] RESPONSABLES DE VIAJE
+            case 3:
+                $menuActivo = "GeneralResponsables";
+                break;
+            // [4] PASAJEROS
+            case 4:
+                $menuActivo = "GeneralPasajeros";
+                break;
+            // [5] REINICIAR LA BASE DE DATOS
+            case 5:
+                echo "¿Está seguro que desea reiniciar la base de datos?\n";
+                echo "Ingrese (Si) para confirmar: ";
+                $eleccion = trim(fgets(STDIN));
+                echo "\n";
+                if (strtolower($eleccion) == "si"){
+                    $empresa = new Empresa();
+                    $colEmpresas = $empresa->listar("");
+                    for($i = 0; $i < count($colEmpresas); $i++){
+                        $colEmpresas[$i]->eliminarEmpresa();
+                    }
 
-                    do{
-                        $permitido = true;
-                        echo "Ingrese la capacidad máxima de pasajeros para el nuevo viaje: ";
-                        $cantMaxPasajeros = trim(fgets(STDIN));
-                        if(!ctype_digit($cantMaxPasajeros) || $cantMaxPasajeros < 0){
-                            $permitido = false;
-                            echo "ERROR: valor ingresado para capacidad máxima inválido\n";
+                    $responsable = new ResponsableV();
+                    $colResponsables = $responsable->listar("");
+                    for($i = 0; $i < count($colResponsables); $i++){
+                        $colResponsables[$i]->eliminar();
+                    }
+                    echo "¡Base de datos reiniciada con éxito!\n";
+                } else {
+                    echo "Base de datos intacta. Será redirigido al menú principal\n";
+                }
+                detenerEjecucion();
+                break;
+            // [0] FINALIZAR PROGRAMA
+            case 0:
+                $menuActivo = "Finalizar";
+                break;
+            default:
+                break;
+        }
+    }
+
+    /*/=======================================================================================\*\
+    ||                                  MENÚS EMPRESAS                                         ||
+    \*\=======================================================================================/*/
+
+    if($menuActivo == "GeneralEmpresa"){
+        $opcionMenu = menuGeneralEmpresa($empresaActiva);
+
+        switch($opcionMenu){
+            // [1] Crear una nueva empresa
+            case 1:
+                echo "Ingrese el nombre de la nueva empresa: ";
+                $nombreEmpresa = trim(fgets(STDIN));
+                echo "Ingrese la dirección de la nueva empresa: ";
+                $direccionEmpresa = trim(fgets(STDIN));
+                $empresa = new Empresa();
+                $empresa->cargar("", $nombreEmpresa, $direccionEmpresa, []);
+                $empresa->insertar();
+
+                echo "\n";
+                echo "Nueva empresa creada con éxito\n";
+                detenerEjecucion();
+                break;
+            // [2] Visualizar información completa de la empresa activa
+            case 2:
+                $empresaActiva->actualizarColViajes();
+                echo $empresaActiva;
+                detenerEjecucion();
+                break;
+            // [3] Modificar datos de la empresa activa/ Eliminar
+            case 3:
+                $menuActivo = "ModificarEmpresa";
+                break;
+            // [4] Cambiar a otra empresa
+            case 4:
+                echo visualizarIDsEmpresas();
+                echo "\n";
+                $empresa = new Empresa();
+                $colEmpresas = $empresa->listar("");
+
+                echo "Ingrese el ID de la empresa a la cual desea cambiar: ";
+                $idEmpresa = trim(fgets(STDIN));
+
+                $posEmpresa = 0;
+                $encontrada = false;
+                while (!$encontrada && $posEmpresa < count($colEmpresas)){
+                    if($colEmpresas[$posEmpresa]->getIdEmpresa() == $idEmpresa){
+                        $encontrada = true;
+                        $empresaActiva = $colEmpresas[$posEmpresa];
+                        $empresaActiva->actualizarColViajes();
+                    }
+                    $posEmpresa++;
+                }
+                echo "\n";
+                if($encontrada){
+                    echo "Cambio de empresa realizado con éxito a: ".$empresaActiva->getNombreEmpresa()."\n";
+                } else {
+                    echo "ERROR: El ID de empresa ingresado no corresponde a una empresa en la base de datos\n";
+                }
+                detenerEjecucion();
+                break;
+            // [5] Visualizar IDs de viajes de la empresa activa
+            case 5:
+                echo visualizarIDsViajes($empresaActiva);
+                detenerEjecucion();
+                break;
+            // [6] Visualizar IDs de todos los responsables en el sistema
+            case 6:
+                echo visualizarIDsResponsables();
+                detenerEjecucion();
+                break;
+            // [7] Visualizar IDs de empresas en el sistema
+            case 7:
+                echo visualizarIDsEmpresas();
+                detenerEjecucion();
+                break;
+            // [0] Volver al menú principal
+            case 0:
+                $menuActivo = "Principal";
+                break;
+            default:
+                break;
+        }
+    }
+
+    if($menuActivo == "ModificarEmpresa"){
+        $opcionMenu = menuModificarEmpresa($empresaActiva);
+        $empresaActiva->actualizarColViajes();
+
+        switch($opcionMenu){
+            // [1] Modificar el nombre de la empresa
+            case 1:
+                echo "Ingrese el nuevo nombre de la empresa: ";
+                $nombreEmpresa = trim(fgets(STDIN));
+                $empresaActiva->setNombreEmpresa($nombreEmpresa);
+                $empresaActiva->modificar();
+                echo "Nombre de la empresa modificado con éxito!";
+                echo "\n";
+                detenerEjecucion();
+                break;
+            // [2] Modificar la dirección de la empresa
+            case 2:
+                echo "Ingrese la nueva dirección de la empresa: ";
+                $direccionEmpresa = trim(fgets(STDIN));
+                $empresaActiva->setDireccionEmpresa($direccionEmpresa);
+                $empresaActiva->modificar();
+                echo "Dirección de la empresa modificada con éxito!";
+                echo "\n";
+                detenerEjecucion();
+                break;
+            // [3] Eliminar empresa
+            case 3:
+                $empresaActiva->eliminarEmpresa();
+                echo "Empresa eliminada con éxito!";
+                echo "\n";
+                detenerEjecucion();
+            // [0] Volver al menú principal
+            case 0:
+                $menuActivo = "Principal";
+                break;
+            default:
+                break;
+        }
+    }
+
+    /*/=======================================================================================\*\
+    ||                                   MENÚS VIAJES                                          ||
+    \*\=======================================================================================/*/
+
+    if($menuActivo == "GeneralViajes"){
+        $opcionMenu = menuGeneralViajes($empresaActiva);
+
+        switch($opcionMenu){
+            // [1] Crear un viaje nuevo
+            case 1: 
+                $responsable = new ResponsableV();
+                $colResponsables = $responsable->listar("");
+
+                if(count($colResponsables) > 0){
+                    $idEmpresa = $empresaActiva->getIdEmpresa();
+                    crearViaje($idEmpresa);
+                    $empresaActiva->actualizarColViajes();
+                } else {
+                    echo "No es posible crear un viaje nuevo debido a que el sistema\n";
+                    echo "no cuenta con responsables en la base de datos.\n";
+                    echo "Ingrese al menos un responsable al sistema para poder asignar a los viajes que desee crear.\n";
+                }
+                detenerEjecucion();
+                $menuActivo = "Principal";
+                break;
+            // [2] Visualizar datos de un viaje
+            case 2:
+                $menuActivo = "VisualizarViaje";
+                break;
+            // [3] Modificar datos de un viaje/ Eliminar
+            case 3:
+                $menuActivo = "ModificarViaje";
+                break;
+            // [0] Volver al menú principal
+            case 0:
+                $menuActivo = "Principal";
+                break;
+            default:
+                break;
+        }
+    }
+
+    if($menuActivo == "VisualizarViaje"){
+
+        echo visualizarIDsViajes($empresaActiva);
+        if(count($empresaActiva->getColViajes()) != 0){
+
+            echo "\n";
+            echo "Ingrese el código de viaje al que desea visualizar sus datos: ";
+            $idViaje = trim(fgets(STDIN));
+            $viaje = new Viaje();
+            $existe = $viaje->Buscar($idViaje);
+            echo "\n";
+
+            if($existe){
+
+                do {
+                    $opcionMenu = menuVisualizarViaje($empresaActiva);
+
+                    switch($opcionMenu){
+                        // [1] Mostrar los datos del viaje completo
+                        case 1:
+                            echo $viaje;
+                            detenerEjecucion();
+                            break;
+                        // [2] Mostrar la colección de pasajeros
+                        case 2:
+                            echo "Colección de pasajeros del viaje actual:\n";
+                            echo "\n";
+                            echo $viaje->mostrarColPasajeros();
+                            detenerEjecucion();
+                            break;
+                        // [3] Mostrar el código de viaje
+                        case 3:
+                            echo "El código del viaje es: ".$viaje->getCodigo()."\n";
+                            detenerEjecucion();
+                            break;
+                        // [4] Mostrar el destino
+                        case 4:
+                            echo "El destino del viaje actual es: ".$viaje->getDestino()."\n";
+                            detenerEjecucion();
+                            break;
+                        // [5] Mostrar la cantidad máxima permitida de pasajeros
+                        case 5:
+                            echo "La cantidad máxima de pasajeros permitida para el viaje es: ".$viaje->getCantMaxPasajeros()."\n";
+                            detenerEjecucion();
+                            break;
+                        // [6] Mostrar al responsable del viaje 
+                        case 6:
+                            echo "El responsable del viaje es:\n";
+                            echo $viaje->getResponsable();
+                            echo "\n";
+                            detenerEjecucion();
+                            break;
+                        // [7] Mostrar el costo del pasaje
+                        case 7:
+                            echo "El costo por pasaje del viaje es de: $".$viaje->getCostoPasaje()."\n";
+                            detenerEjecucion();
+                            break;
+                        // [8] Mostrar la recaudación total
+                        case 8:
+                            echo "La recaudación total actual del viaje es de: $".$viaje->getRecaudacionTotal()."\n";
+                            detenerEjecucion();
+                            break;
+                        // [9] Mostrar los asientos disponibles
+                        case 9:
+                            echo $viaje->mostrarAsientosLibres()."\n";
+                            detenerEjecucion();
+                            break;
+                        // [10] Mostrar la cantidad de asientos disponibles
+                        case 10:
+                            echo "La cantidad de asientos disponibles es: ".$viaje->cantidadAsientosDisponibles()."\n";
+                            detenerEjecucion();
+                            break;
+                        // [0] Volver al menú principal
+                        case 0:
+                            $menuActivo = "Principal";
+                            break;
+                        default:
+                            break;
+                    }
+
+                } while ($opcionMenu != 0);
+                
+            } else {
+                echo "\n";
+                echo "ERROR: El código ingresado no corresponde a un viaje perteneciente a esta empresa\n";
+                echo "Será redirigido al menú principal\n";
+                $menuActivo = "Principal";
+                detenerEjecucion();
+            }
+        } else {
+            echo "Será redirigido al menú principal\n";
+            $menuActivo = "Principal";
+            detenerEjecucion();
+        }
+        
+    }
+
+    if($menuActivo == "ModificarViaje"){
+
+        echo visualizarIDsViajes($empresaActiva);
+        if(count($empresaActiva->getColViajes()) != 0){
+
+            echo"\n";
+            echo "Ingrese el código de viaje al que desea modificar sus datos: ";
+            $idViaje = trim(fgets(STDIN));
+            $viaje = new Viaje();
+            $existe = $viaje->Buscar($idViaje);
+            echo "\n";
+            
+            if($existe){
+
+                do {
+                    $opcionMenu = menuModificarViaje($empresaActiva);
+
+                    switch($opcionMenu){
+                        // [1] Modificar el destino
+                        case 1:
+                            echo "Destino actual del viaje: ".$viaje->getDestino()."\n";
+                            echo "Ingrese el nuevo destino del viaje: ";
+                            $destino = trim(fgets(STDIN));
+                            $viaje->setDestino($destino);
+                            $viaje->modificar();
+                            echo "\n";
+                            echo "¡Destino modificado con éxito!\n";
+                            detenerEjecucion();
+                            break;
+                        // [2] Modificar la cantidad máxima permitida de pasajeros
+                        case 2:
+                            echo "Cantidad máxima de pasajeros permitida actual: ".$viaje->getCantMaxPasajeros()."\n";
+                            echo "Ingrese la nueva cantidad máxima permitida de pasajeros para este viaje: ";
+                            $cantMaxPasajeros = trim(fgets(STDIN));
+                            if (!ctype_digit($cantMaxPasajeros) || $cantMaxPasajeros < 0){      
+                                echo "ERROR: valor ingresado para cantidad máxima de pasajeros inválido\n";
+                            } else if ($cantMaxPasajeros < $viaje->mayorAsientoOcupado()){
+                                echo "ERROR: cantidad máxima ingresada no compatible\n";
+                                echo "con los asientos ocupados actualmente\n";
+                            }else{
+                                $cantMaxPasajeros = (int)$cantMaxPasajeros;
+                                $viaje->setCantMaxPasajeros($cantMaxPasajeros);
+                                $viaje->modificar();
+                                echo "\n";
+                                echo "¡Cantidad máxima de pasajeros modificada con éxito!\n";
+                            }
+                            detenerEjecucion();
+                            break;
+                        // [3] Asignar un nuevo responsable de viaje
+                        case 3:
+                            echo "Ingrese el número de empleado del nuevo responsable que desea asignar al viaje: ";
+                            $idResponsable = trim(fgets(STDIN));
+                            $responsable = new ResponsableV();
+                            $exito = $responsable->Buscar($idResponsable);
+                            
+                            echo "\n";
+                            if($exito) {
+                                $viaje->setResponsable($responsable);
+                                $viaje->modificar();
+                                echo "¡Nuevo responsable de viaje cargado con éxito!\n";
+                            } else {
+                                echo "ERROR: el N° de empleado ingresado no corresponde a un responsable cargado en la base de datos";
+                            }
+                            detenerEjecucion();
+                            break;
+                        // [4] Modificar el costo del pasaje
+                        case 4:
+                            echo "Costo de pasaje actual para el viaje: $".$viaje->getCostoPasaje()."\n";
+                            do{
+                                $permitido = true;
+                                echo "Ingrese el nuevo costo de pasaje para el viaje: $";
+                                $costo = trim(fgets(STDIN));
+                                if(!is_numeric($costo) || $costo < 0){
+                                    $permitido = false;
+                                    echo "ERROR: valor ingresado para costo de pasaje inválido\n";
+                                }
+                            }while(!$permitido);
+                            $costo = (float)$costo;
+                            $viaje->setCostoPasaje($costo);
+                            $viaje->actualizarRecaudacionTotal();
+                            $viaje->modificar();
+                            echo "¡Nuevo costo de pasaje para el viaje modificado con éxito!\n";
+                            detenerEjecucion();
+                            break;
+                        // [5] Quitar todos los pasajeros del viaje
+                        case 5:
+                            $viaje->vaciarViaje();
+                            echo "¡Todos los pasajeros han sido quitados del viaje con éxito!\n";
+                            detenerEjecucion();
+                            break;
+                        // [6] Eliminar viaje
+                        case 6:
+                            $viaje->eliminarViaje();
+                            echo "¡Viaje eliminado con éxito!\n";
+                            $opcionMenu = 0;
+                            $menuActivo = "Principal";
+                            detenerEjecucion();
+                            break;
+                        // [0] Volver al menú principal
+                        case 0:
+                            $menuActivo = "Principal";
+                            break;
+                        default:
+                            break;
+                    }
+
+                } while ($opcionMenu != 0);
+            } else {
+                echo "\n";
+                echo "ERROR: El código ingresado no corresponde a un viaje perteneciente a esta empresa\n";
+                echo "Será redirigido al menú principal\n";
+                detenerEjecucion();
+                $menuActivo = "Principal";
+            }
+        } else {
+            echo "Será redirigido al menú principal\n";
+            $menuActivo = "Principal";
+            detenerEjecucion();
+        }   
+    }
+    
+    /*/=======================================================================================\*\
+    ||                                  MENÚS RESPONSABLES                                     ||
+    \*\=======================================================================================/*/
+
+    if($menuActivo == "GeneralResponsables"){
+        $opcionMenu = menuGeneralResponsables($empresaActiva);
+
+        switch($opcionMenu){
+            // [1] Crear un responsable nuevo
+            case 1:
+                crearResponsable();
+                echo "\n";
+                echo "¡Responsable creado con éxito!\n";
+                detenerEjecucion();
+                $menuActivo = "Principal";
+                break;
+            // [2] Visualizar datos de un responsable
+            case 2:
+                $menuActivo = "VisualizarResponsable";
+                break;
+            // [3] Modificar datos de un responsable
+            case 3:
+                $menuActivo = "ModificarResponsable";
+                break;
+            // [4] Eliminar responsable
+            case 4:
+                echo visualizarIDsResponsables();
+                echo "\n";
+                echo "Ingrese el número de empleado del responsable que desea eliminar de la BD: ";
+                $idResponsable = trim(fgets(STDIN));
+                $responsable = new ResponsableV();
+                $existe = $responsable->Buscar($idResponsable);
+                
+                if($existe){
+                    $viaje = new Viaje();
+                    $colViajes = $viaje->listar("rnumeroempleado = ".$idResponsable);
+
+                    if (count($colViajes) == 0){
+                        $responsable->eliminar();
+                        echo "\n";
+                        echo "¡Responsable eliminado de la base de datos con éxito!\n";
+                    } else {
+                        $cadena = "El responsable no puede ser eliminado de la base de datos\n";
+                        $cadena = $cadena. "por que se encuentra asignado a los siguientes viajes:\n\n";
+
+                        for ($i = 0; $i < count($colViajes); $i++){
+                            $cadena = $cadena. "[ID viaje: ".$colViajes[$i]->getCodigo()."]";
+                            $cadena = $cadena. "[Destino: ".$colViajes[$i]->getDestino()."]";
+                            $cadena = $cadena. "[ID Empresa: ".$colViajes[$i]->getEmpresa()->getIdEmpresa()."]";
+                            $cadena = $cadena. "[Nombre: ".$colViajes[$i]->getEmpresa()->getNombreEmpresa()."]\n";
                         }
-                    }while(!$permitido);
-                    
-                    $cantMaxPasajeros = (int)$cantMaxPasajeros;
-                    $numeroEmpleado++;
-                    $responsable = crearResponsable($numeroEmpleado);
-
-                    do{
-                        $permitido = true;
-                        echo "Ingrese el costo de pasaje para el viaje: $";
-                        $costo = trim(fgets(STDIN));
-                        if(!is_numeric($costo) || $costo < 0){
-                            $permitido = false;
-                            echo "ERROR: valor ingresado para costo de pasaje inválido\n";
-                        }
-                    }while(!$permitido);
-
-                    $costo = (float)$costo;
-                    $viaje = new Viaje($codigo, $destino, $cantMaxPasajeros, [], $responsable, $costo);
+                        echo "\n";
+                        echo $cadena;    
+                    }
+                } else {
                     echo "\n";
-                    echo "¡Viaje creado con éxito!\n";
-                    detenerEjecucion();
-                    break;
-                // 1 [2] Vender un pasaje del viaje a un pasajero
-                case 2:
-                    $pasajero = crearPasajero($ultimoTicket);
+                    echo "ERROR: El número de empleado igresado no corresponde a un responsable en el sistema\n";
+                    echo "Será redirigido al menú principal\n";
+                }
+                $menuActivo = "Principal";
+                detenerEjecucion();
+                break;
+            // [0] Volver al menú principal
+            case 0:
+                $menuActivo = "Principal";
+                break;
+            default:
+                break;
+        }
+    }
+
+    if($menuActivo == "VisualizarResponsable"){
+
+        echo visualizarIDsResponsables();
+        echo "\n";
+        echo "Ingrese el número de empleado del responsable que desea visualizar sus datos: ";
+        $idResponsable = trim(fgets(STDIN));
+        $responsable = new ResponsableV();
+        $existe = $responsable->Buscar($idResponsable);
+
+        if($existe){
+
+            do {
+                $opcionMenu = menuVisualizarResponsable($empresaActiva);
+
+                switch($opcionMenu){
+                    // [1] Mostrar todos los datos del responsable
+                    case 1:
+                        echo $responsable;
+                        echo "\n";
+                        detenerEjecucion();
+                        break;
+                    // [2] Mostrar número de empleado
+                    case 2:
+                        echo "El número de empleado es: ".$responsable->getNumeroEmpleado();
+                        echo "\n";
+                        detenerEjecucion();
+                        break;
+                    // [3] Mostrar número de licencia
+                    case 3:
+                        echo "El número de licencia es: ".$responsable->getNumeroLicencia();
+                        echo "\n";
+                        detenerEjecucion();
+                        break;
+                    // [4] Mostrar el nombre
+                    case 4:
+                        echo "El nombre del responsable es: ".$responsable->getNombre();
+                        echo "\n";
+                        detenerEjecucion();
+                        break;
+                    // [5] Mostrar el apellido
+                    case 5:
+                        echo "El apellido del responsable es: ".$responsable->getApellido();
+                        echo "\n";
+                        detenerEjecucion();
+                        break;
+                    // [6] Mostrar todos los viajes a los que se encuentra asignado
+                    case 6:
+                        echo visualizarViajesResponsable($idResponsable);
+                        echo "\n";
+                        detenerEjecucion();
+                        break;
+                    // [0] Volver al menú principal
+                    case 0:
+                        $menuActivo = "Principal";
+                        break;
+                    default:
+                        break;
+                }
+
+            } while ($opcionMenu != 0);
+            
+        } else {
+            echo "\n";
+            echo "ERROR: El número de empleado ingresado no corresponde a ningún responsable en la base de datos\n";
+            echo "Será redirigido al menú principal\n";
+            detenerEjecucion();
+            $menuActivo = "Principal";
+        }
+    }
+
+    if($menuActivo == "ModificarResponsable"){
+
+        echo visualizarIDsResponsables();
+        echo "\n";
+        echo "Ingrese el número de empleado del responsable que desea modificar sus datos: ";
+        $idResponsable = trim(fgets(STDIN));
+        $responsable = new ResponsableV();
+        $existe = $responsable->Buscar($idResponsable);
+
+        if($existe){
+            echo "Estado del responsable:\n";
+            echo $responsable."\n\n"; 
+    
+            echo "Ingrese los nuevos valores para cada campo que desee actualizar del responsable\n";
+            echo "(ignore los campos que no desee modificar)\n\n";
+            echo "Ingrese un nuevo nombre: ";
+            $nombre = trim(fgets(STDIN));
+            echo "Ingrese un nuevo apellido: ";
+            $apellido = trim(fgets(STDIN));
+            echo "Ingrese un nuevo número de licencia: ";
+            $numeroLicencia = trim(fgets(STDIN));
+            
+            $responsable->modificarResponsable($nombre, $apellido, $numeroLicencia);
+            $exito = $responsable->modificar();
+
+            echo "\n";
+            if($exito){
+                echo "Responsable actualizado:\n";
+                echo $responsable."\n";
+            } else {
+                echo $responsable->getMensajeOperacion();
+            }
+        } else {
+            echo "\n";
+            echo "ERROR: El número de empleado ingresado no corresponde a ningún responsable en la base de datos\n";
+        }
+        $menuActivo = "Principal";
+        detenerEjecucion();        
+    }
+
+    /*/=======================================================================================\*\
+    ||                                    MENÚS PASAJEROS                                      ||
+    \*\=======================================================================================/*/
+
+    if($menuActivo == "GeneralPasajeros"){
+        $opcionMenu = menuGeneralPasajeros($empresaActiva);
+
+        switch($opcionMenu){
+            // [1] Vender pasajes
+            case 1:
+                $menuActivo = "VenderPasajes";
+                break;
+            // [2] Visualizar datos de un pasajero
+            case 2:
+                $menuActivo = "VisualizarPasajero";
+                break;
+            // [3] Modificar datos de un pasajero/ Quitar pasajero del viaje
+            case 3:
+                $menuActivo = "ModificarPasajero";
+                break;
+            // [0] Volver al menú principal
+            case 0:
+                $menuActivo = "Principal";
+                break;
+            default:
+                break;
+        }
+    }
+
+    if($menuActivo == "VenderPasajes"){
+        $opcionMenu = menuVenderPasajes($empresaActiva);
+
+        switch($opcionMenu){
+            // [1] Realizar una venta manual de un pasaje
+            case 1:
+                $menuActivo = "VenderPasajesManual";
+                break;
+            // [2] Realizar una venta automática de varios pasajes
+            case 2:
+                $menuActivo = "VenderPasajesAutomatico";
+                break;
+            // [0] Volver al menú principal
+            case 0:
+                $menuActivo = "Principal";
+                break;
+            default:
+                break;
+        }
+    }
+
+    if($menuActivo == "VenderPasajesManual"){
+
+        echo visualizarIDsViajes($empresaActiva);
+        if(count($empresaActiva->getColViajes()) != 0){
+
+            echo "\n";
+            echo "Ingrese el código de viaje del cual desea vender un pasaje: ";
+            $idViaje = trim(fgets(STDIN));
+            $viaje = new Viaje();
+            $existe = $viaje->Buscar($idViaje);
+            
+            echo "\n";
+            if($existe){
+                
+                $pasajero = crearPasajero($idViaje, $ultimoTicket);
+                $pasajero2 = new Pasajero();
+                $colPasajeros = $pasajero2->listar("");
+                $pos = 0;
+                $exito = true;
+
+                while($pos < count($colPasajeros) && $exito){
+                    if($pasajero->getDocumento() == $colPasajeros[$pos]->getDocumento()){
+                        $exito = false;
+                    }
+                    $pos++;
+                }
+
+                echo "\n";
+                if($exito){
                     $costo = $viaje->venderPasaje($pasajero);
-                    echo "\n";
+
                     if($costo != -1){
+
                         $ultimoTicket ++;
                         echo "¡Pasaje vendido con éxito!\n";
                         echo "Deberá abonar: $".$costo."\n";
+        
                     } else {
+                        $pasajero->eliminar();
                         if($viaje->existePasajero($pasajero->getDocumento())){
                             echo "ERROR: ya existe este número de documento dentro del viaje\n";
                         }
@@ -769,451 +2007,329 @@ do {
                             echo "ERROR: el viaje tiene todos sus pasajes vendidos\n"; 
                         }
                     }
-                    detenerEjecucion();
-                    break;
-                // 1 [3] Asignar una nueva colección de pasajeros al viaje (reemplaza la actual)
-                case 3:
-                    echo "Ingrese la cantidad de pasajeros aleatorios que desea crear: ";
-                    $cantPasajeros = (trim(fgets(STDIN)));
+                } else {
                     echo "\n";
-                    if (!ctype_digit($cantPasajeros) || $cantPasajeros < 0 ){
-                        echo "ERROR: valor no válido para cantidad de pasajeros\n";
-                    } else if($cantPasajeros > $viaje->getCantMaxPasajeros()){
-                        echo "ERROR: la cantidad de pasajeros ingresada excede la capacidad máxima del viaje\n";
-                    } else {
-                            $colPasajeros = crearColeccionPasajerosAutomatica(
-                                $cantPasajeros, $viaje->getCantMaxPasajeros(), $ultimoTicket);
-
-                            $ultimoTicket += $cantPasajeros;
-                            $viaje->renovarPasajeros($colPasajeros);
-                            echo "¡Carga automática de pasajeros realizada con éxito!\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 1 [4] Asignar un nuevo responsable de viaje
-                case 4:
-                    $numeroEmpleado++;
-                    $responsable = crearResponsable($numeroEmpleado);
-                    $viaje->setResponsable($responsable);
-                    echo "\n";
-                    echo "¡Nuevo responsable cargado con éxito!\n";
-                    detenerEjecucion();
-                    break;
-                // 1 [5] modificar responsable de viaje actual
-                case 5:
-                    echo "Estado del responsable:\n";
-                    echo $responsable."\n\n"; 
-
-                    echo "Ingrese los nuevos valores para cada campo que desee actualizar del responsable\n";
-                    echo "(ignore los campos que no desee modificar)\n\n";
-                    echo "Ingrese un nuevo nombre: ";
-                    $nombre = trim(fgets(STDIN));
-                    echo "Ingrese un nuevo apellido: ";
-                    $apellido = trim(fgets(STDIN));
-                    echo "Ingrese un nuevo número de licencia: ";
-                    $numeroLicencia = trim(fgets(STDIN));
-                    
-                    $viaje->modificarResponsable($nombre, $apellido, $numeroLicencia);
-
-                    echo "\n";
-                    echo "Responsable actualizado:\n";
-                    echo $responsable."\n"; 
-                    detenerEjecucion();
-                    break;
-                // 1 [6] Modificar el destino del viaje
-                case 6:
-                    echo "Destino actual del viaje: ".$viaje->getDestino()."\n";
-                    echo "Ingrese el nuevo destino del viaje: ";
-                    $destino = trim(fgets(STDIN));
-                    $viaje->setDestino($destino);
-                    echo "\n";
-                    echo "¡Destino modificado con éxito!\n";
-                    detenerEjecucion();
-                    break;
-                // 1 [7] Modificar la cantidad máxima permitida de pasajeros para el viaje
-                case 7:
-                    echo "Cantidad máxima de pasajeros permitida actual: ".$viaje->getCantMaxPasajeros()."\n";
-                    echo "Ingrese la nueva cantidad máxima permitida de pasajeros para este viaje: ";
-                    $cantMaxPasajeros = trim(fgets(STDIN));
-                    if (!ctype_digit($cantMaxPasajeros) || $cantMaxPasajeros < 0){      
-                        echo "ERROR: valor ingresado para cantidad máxima de pasajeros inválido\n";
-                    } else if ($cantMaxPasajeros < $viaje->mayorAsientoOcupado()){
-                        echo "ERROR: cantidad máxima ingresada no compatible\n";
-                        echo "con los asientos ocupados actualmente\n";
-                    }else{
-                        $cantMaxPasajeros = (int)$cantMaxPasajeros;
-                        $viaje->setCantMaxPasajeros($cantMaxPasajeros);
-                        echo "\n";
-                        echo "¡Cantidad máxima de pasajeros modificada con éxito!\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 1 [8] Modificar el costo de pasaje para el viaje
-                case 8:
-                    echo "Costo de pasaje actual para el viaje: $".$viaje->getCostoPasaje()."\n";
-                    do{
-                        $permitido = true;
-                        echo "Ingrese el nuevo costo de pasaje para el viaje: $";
-                        $costo = trim(fgets(STDIN));
-                        if(!is_numeric($costo) || $costo < 0){
-                            $permitido = false;
-                            echo "ERROR: valor ingresado para costo de pasaje inválido\n";
-                        }
-                    }while(!$permitido);
-                    $costo = (float)$costo;
-                    $viaje->setCostoPasaje($costo);
-                    $viaje->actualizarRecaudacionTotal();
-                    echo "¡Nuevo costo de pasaje para el viaje modificado con éxito!\n";
-                    detenerEjecucion();
-                    break;
-                // 1 [0] Vuelve al menú principal
-                case 0:    
-                    break;
-                // 1 En caso de error accederá a esta opción y volverá al menú principal
-                default:
-                    break;
+                    echo "ERROR: El documento de pasajero ingresado ya está se encuentra registrado en la base de datos\n";
+                    echo "Será redirigido al menú principal\n";
+                }   
+            } else {
+                echo "\n";
+                echo "ERROR: El código ingresado no corresponde a un viaje perteneciente a esta empresa\n";
+                echo "Será redirigido al menú principal\n";
             }
-            break;
-        // [[2]] MENÚ PARA OBSERVAR DATOS DEL VIAJE
-        case 2:
-            $opcionMenuOperaciones = menuObservarViaje();
-            switch($opcionMenuOperaciones){
-                // 2 [1] Visualizar la información completa del viaje
-                case 1:
-                    echo $viaje;
-                    detenerEjecucion();
-                    break;
-                // 2 [2] Visualizar la colección del pasajeros
-                case 2:
-                    echo "Colección de pasajeros del viaje actual:\n";
-                    echo "\n";
-                    echo $viaje->mostrarColPasajeros();
-                    detenerEjecucion();
-                    break;
-                // 2 [3] Visualizar el código del viaje
-                case 3:
-                    echo "El código del viaje es: ".$viaje->getCodigo()."\n";
-                    detenerEjecucion();
-                    break;
-                // 2 [4] Visualizar el destino del viaje
-                case 4:
-                    echo "El destino del viaje actual es: ".$viaje->getDestino()."\n";
-                    detenerEjecucion();
-                    break;
-                // 2 [5] Visualizar la cantidad máxima de pasajeros permitida
-                case 5:
-                    echo "La cantidad máxima de pasajeros permitida para el viaje es: ".$viaje->getCantMaxPasajeros()."\n";
-                    detenerEjecucion();
-                    break;
-                // 2 [6] Visualizar al responsable del viaje
-                case 6:
-                    echo "El responsable del viaje es:\n";
-                    echo $viaje->getResponsable();
-                    echo "\n";
-                    detenerEjecucion();
-                    break;
-                // 2 [7] Visualizar el costo por pasaje del viaje
-                case 7:
-                    echo "El costo por pasaje del viaje es: $".$viaje->getCostoPasaje()."\n";
-                    detenerEjecucion();
-                    break;
-                // 2 [8] Visualizar la recaudación total actual del viaje
-                case 8:
-                    echo "La recaudación total actual del viaje es: $".$viaje->getRecaudacionTotal()."\n";
-                    detenerEjecucion();
-                    break;
-                // 2 [9] Visualizar los asientos libres
-                case 9:
-                    echo $viaje->mostrarAsientosLibres()."\n";
-                    detenerEjecucion();
-                    break;
-                // 2 [10] Visualizar la cantidad de asientos disponibles
-                case 10:
-                    echo "La cantidad de asientos disponibles es: ".$viaje->cantidadAsientosDisponibles()."\n";
-                    detenerEjecucion();
-                    break;
-                // 2 [0] Vuelve al menú principal
-                case 0:
-                    break;
-                // 2 En caso de error accederá a esta opción y volverá al menú principal
-                default:
-                    break;
-            }
-            break;
-        // [[3]] MENÚ PARA QUITAR/MODIFICAR PASAJEROS DEL VIAJE
-        case 3:
-            $opcionMenuOperaciones = menuModificarPasajero();
-            switch($opcionMenuOperaciones){
-                // 3 [1] Quitar un pasajero del viaje
-                case 1:
-                    echo "Ingrese el número de documento del pasajero que desea quitar del viaje: ";
-                    $documento = trim(fgets(STDIN));
-                    $pasajero = $viaje->mostrarPasajero($documento);
-                    $esPosible = $viaje->quitarPasajero($documento);
-                    echo "\n";
-
-                    if($esPosible){
-                        echo "¡Pasajero quitado del viaje con éxito!\n";
-                        echo $pasajero."\n\n";
-                    } else {
-                        echo "ERROR: no se pudo quitar al pasajero del viaje\n";
-                        echo "(no se encontro el documento ingresado en el viaje actual)\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [2] Quitar todos los pasajeros del viaje
-                case 2:
-                    $viaje->vaciarViaje();
-                    echo "¡Todos los pasajeros han sido quitados del viaje con éxito!\n";
-                    detenerEjecucion();
-                    break;
-                // 3 [3] Modificar el nombre de un pasajero
-                case 3:
-                    echo "Ingrese el número de documento del pasajero al que desea cambiar su nombre: ";
-                    $documento = trim(fgets(STDIN));
-                    $pasajero = $viaje->mostrarPasajero($documento);
-                    echo "\n";
-
-                    if($pasajero != null){
-                        echo "Estado del pasajero:\n";
-                        echo $pasajero."\n\n";
-
-                        echo "Ingrese el nuevo nombre que desea asignar al pasajero: ";
-                        $nombre = trim(fgets(STDIN));
-                        $viaje->modificarNombrePasajero($documento, $nombre);
-                        echo "\n";
-                        echo "¡Se modificó el nombre del pasajero con éxito!\n";
-                        echo $pasajero."\n";
-                    } else {
-                        echo "ERROR: no se pudo modificar el nombre del pasajero\n";
-                        echo "(no se encontro el documento ingresado en el viaje actual)\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [4] Modificar el apellido de un pasajero
-                case 4:
-                    echo "Ingrese el número de documento del pasajero al que desea cambiar su apellido: ";
-                    $documento = trim(fgets(STDIN));
-                    $pasajero = $viaje->mostrarPasajero($documento);
-                    echo "\n";
-
-                    if($pasajero != null){
-                        echo "Estado del pasajero:\n";
-                        echo $pasajero."\n\n";
-
-                        echo "Ingrese el nuevo apellido que desea asignar al pasajero: ";
-                        $apellido = trim(fgets(STDIN));
-                        $viaje->modificarApellidoPasajero($documento, $apellido);
-                        echo "\n";
-                        echo "¡Se modificó el apellido del pasajero con éxito!\n";
-                        echo $pasajero."\n";
-                    } else {
-                        echo "ERROR: no se pudo modificar el apellido del pasajero\n";
-                        echo "(no se encontro el documento ingresado en el viaje actual)\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [5] Modificar el número de teléfono de un pasajero
-                case 5:
-                    echo "Ingrese el número de documento del pasajero al que desea cambiar su número de teléfono: ";
-                    $documento = trim(fgets(STDIN));
-                    $pasajero = $viaje->mostrarPasajero($documento);
-                    echo "\n";
-
-                    if($pasajero != null){
-                        echo "Estado del pasajero:\n";
-                        echo $pasajero."\n\n";
-
-                        echo "Ingrese el nuevo número de teléfono que desea asignar al pasajero: ";
-                        $numeroTelefono = trim(fgets(STDIN));
-                        $viaje->modificarTelefonoPasajero($documento, $numeroTelefono);
-                        echo "\n";
-                        echo "¡Se modificó el número de teléfono del pasajero con éxito!\n";
-                        echo $pasajero."\n";
-                    } else {
-                        echo "ERROR: no se pudo modificar el número de teléfono del pasajero\n";
-                        echo "(no se encontro el documento ingresado en el viaje actual)\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [6] Modificar el número de asiento del pasajero
-                case 6:
-                    if($viaje->hayPasajesDisponible()){
-                        echo "Ingrese el número de documento del pasajero al que desea cambiar su número de asiento: ";
-                        $documento = trim(fgets(STDIN));
-                        $pasajero = $viaje->mostrarPasajero($documento);
-                        echo "\n";
-                        if($pasajero != null){    
-                                echo $viaje->mostrarAsientosLibres()."\n";
-                                echo "Estado del pasajero:\n";
-                                echo $pasajero."\n\n";
-                                echo "Ingrese el nuevo número de asiento que desea asignar al pasajero: ";
-                                $numeroAsiento = trim(fgets(STDIN));
-                                $esPosible = $viaje->modificarAsientoPasajero($documento, $numeroAsiento);
-                                echo "\n";
-                                if($esPosible){
-                                    echo $viaje->mostrarAsientosLibres()."\n";
-                                    echo "¡Se modificó el número asiento del pasajero con éxito!\n";
-                                    echo $pasajero."\n";
-                                } else {
-                                    echo "ERROR: no se pudo modificar el número de asiento del pasajero\n";
-                                    if($numeroAsiento <= $viaje->getCantMaxPasajeros() && $numeroAsiento >= 1){
-                                        echo "(el número de asiento elegido ya se encuentra ocupado)\n";
-                                    }else{
-                                        echo "(no existe en el viaje el número de asiento elegido)\n";
-                                    }
-                                }
-                        } else {
-                            echo "ERROR: no se pudo modificar el número de asiento del pasajero\n";
-                            echo "(no se encontro el documento ingresado en el viaje actual)\n";
-                        }
-                    } else {
-                        echo "ERROR: no hay asientos disponibles para elegir en este viaje\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [7] Modificar campos de un pasajero especial
-                case 7:
-                    echo "Ingrese el número de documento del pasajero especial al cual desea modificar sus datos: ";
-                    $documento = trim(fgets(STDIN));
-                    $pasajero = $viaje->mostrarPasajero($documento);
-                    echo "\n";
-
-                    if($pasajero != null){
-                        if($pasajero instanceof PasajeroEspecial){
-                            echo "Estado del pasajero:\n";
-                            echo $pasajero."\n\n";
-
-                            echo "Ingrese Si/No para cada servicio que desee actualizar\n";
-                            echo "(ignore los servicios que no desee modificar)\n\n";
-                            echo "Servicio de silla de ruedas: ";
-                            $servicioSilla = trim(fgets(STDIN));
-                            echo "Servicio de asistencia para embarque/desembarque: ";
-                            $servicioAsistencia = trim(fgets(STDIN));
-                            echo "Servicio de comida especial: ";
-                            $servicioComida = trim(fgets(STDIN));
-
-                            $viaje->modificarServiciosEspecialesPasajero(
-                                $documento, $servicioSilla, $servicioAsistencia, $servicioComida);
-                            echo "\n";
-                            echo "Pasajero actualizado:\n";
-                            echo $pasajero."\n";
-
-                        } else {
-                            echo "ERROR: el número de documento ingresado no corresponde a un pasajero de tipo especial\n";
-                        }
-                    } else {
-                        echo "ERROR: el número de documento ingresado no existe en el viaje actual\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [8] Modificar campos de un pasajero VIP
-                case 8:
-                    echo "Ingrese el número de documento del pasajero VIP al cual desea modificar sus datos: ";
-                    $documento = trim(fgets(STDIN));
-                    $pasajero = $viaje->mostrarPasajero($documento);
-                    echo "\n";
-
-                    if($pasajero != null){
-                        if($pasajero instanceof PasajeroVIP){
-                            echo "Estado del pasajero:\n";
-                            echo $pasajero."\n\n"; 
-
-                            echo "Ingrese los nuevos valores para cada campo que desee actualizar\n";
-                            echo "(ignore los campos que no desee modificar)\n\n";
-                            echo "Ingrese un número de viajero frecuente: ";
-                            $nroViajeroFrecuente = trim(fgets(STDIN));
-                            do{
-                                $permitido = true;
-                                echo "Ingrese la nueva cantidad de millas (campo con validación): ";
-                                $cantMillas = trim(fgets(STDIN));
-                                if(!$cantMillas == ""){
-                                    if(!ctype_digit($cantMillas) || $cantMillas < 0){
-                                        $permitido = false;
-                                        echo "ERROR: valor ingresado para cantidad de millas inválido\n";
-                                    }
-                                }
-                            } while (!$permitido);
-
-                            $viaje->modificarCamposVIPPasajero($documento, $nroViajeroFrecuente, $cantMillas);
-                            echo "\n";
-                            echo "Pasajero actualizado:\n";
-                            echo $pasajero."\n";
-
-                        } else {
-                            echo "ERROR: el número de documento ingresado no corresponde a un pasajero de tipo VIP\n";
-                        }
-                    } else {
-                        echo "ERROR: el número de documento ingresado no existe en el viaje actual\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [9] Visualizar pasajero por número de documento
-                case 9:
-                    echo "Ingrese el número de documento del pasajero que desea visualizar sus datos: ";
-                    $documento = trim(fgets(STDIN));
-                    $pasajero = $viaje->mostrarPasajero($documento);
-                    echo "\n";
-
-                    if($pasajero == null){
-                        echo "ERROR: el documento ingresado no corresponde a ningún pasajero en el viaje\n";
-                    } else {
-                        echo "Pasajero encontrado:\n";
-                        echo $pasajero;
-                        echo "\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [10] Visualizar pasajero por número de asiento
-                case 10:
-                    echo "Ingrese el número de asiento del pasajero que desea visualizar sus datos: ";
-                    $numeroAsiento = trim(fgets(STDIN));
-                    $pasajero = $viaje->mostrarPasajeroPorNroAsiento($numeroAsiento);
-                    echo "\n";
-
-                    if($pasajero == null){
-                        echo "ERROR: el número de asiento ingresado no corresponde a ningún pasajero en el viaje\n";
-                    } else {
-                        echo "Pasajero encontrado:\n";
-                        echo $pasajero;
-                        echo "\n";
-                    }
-                    detenerEjecucion();
-                    break;
-                // 3 [0] Vuelve al menú principal
-                case 0:
-                    break;
-                // 3 En caso de error accederá a esta opción y volverá al menú principal
-                default:
-                    break;
-            }
-            break;
-        // [[0]] Finaliza el programa
-        case 0:
-            echo "¡PROGRAMA FINALIZADO!\n";
-            echo "\n";
-            break;
-        // En caso de error accederá a esta opción y se finalizará el programa
-        default:
-            break;
+        }else{
+            echo "Será redirigido al menú principal\n";
+        }
+        echo"\n";
+        $menuActivo = "Principal";
+        detenerEjecucion();
     }
 
-} while ($opcionMenuPrincipal != 0);
+    if($menuActivo == "VenderPasajesAutomatico"){
 
-/*
-OBSERVACIONES:
-1. No se permite modificar el código de viaje por considerarse una identificación unívoca.
-Aunque en este caso no se manipule una colección de viajes, en caso de que se desee cambiar el código
-de viaje debe crearse uno nuevo.
+        echo visualizarIDsViajes($empresaActiva);
+        if(count($empresaActiva->getColViajes()) != 0){
 
-2. No se permite modificar el documento de los pasajeros por considerarse una identificación unívoca.
-En caso de ser necesario se borra y se crea un nuevo pasajero.
+            echo "\n";
+            echo "Ingrese el código de viaje del cual desea vender un pasaje: ";
+            $idViaje = trim(fgets(STDIN));
+            $viaje = new Viaje();
+            $existe = $viaje->Buscar($idViaje);
+            
+            echo "\n";
+            if($existe){
+                $asientosDisponibles = $viaje->cantidadAsientosDisponibles();
+                $pasajero = new Pasajero();
+                $maxDocumento = $pasajero->maximoDocumento();
 
-3. No se permite cambiar el número de ticket de un pasajero, estos se generan automáticamente a medida
-que se venden los pasajes y cada uno corresponde a un pasaje vendido.
+                echo "Ingrese la cantidad de pasajeros aleatorios que desea crear: ";
+                $cantPasajeros = (trim(fgets(STDIN)));
+                echo "\n";
+                if (!ctype_digit($cantPasajeros) || $cantPasajeros < 0 ){
+                    echo "ERROR: valor no válido para cantidad de pasajeros\n";
+                } else if($cantPasajeros > $asientosDisponibles){
+                    echo "ERROR: la cantidad de pasajeros ingresada excede la capacidad máxima del viaje\n";
+                } else {
+                    $colAsientos = $viaje->arregloAsientosLibres();
+                    $colPasajeros = crearColeccionPasajerosAutomatica(
+                    $cantPasajeros, $colAsientos, $ultimoTicket, $idViaje);
 
-4. No se permite cambiar el número de empleado de un responsable, estos se generan automáticamente a medida
-que se crean los responsables.
-*/
+                    $ultimoTicket += $cantPasajeros;
+                    $viaje->cargaColPasajeros($colPasajeros);
+                    echo "¡Carga automática de pasajeros realizada con éxito!\n";
+                }
+            } else {
+                echo "\n";
+                echo "ERROR: El código ingresado no corresponde a un viaje perteneciente a esta empresa\n";
+                echo "Será redirigido al menú principal\n";
+            }
+        } else {
+            echo "Será redirigido al menú principal\n";
+        }
+        $menuActivo = "Principal";
+        detenerEjecucion();
+    }
+
+    if($menuActivo == "VisualizarPasajero"){
+
+        echo "Ingrese el documento del pasajero que desea visualizar sus datos: ";
+        $documento = trim(fgets(STDIN));
+        $pasajero = new Pasajero();
+        $existe = $pasajero->Buscar($documento);
+
+        /*
+        if($existe){
+            $pasajeroEspecial = new PasajeroEspecial();
+            $existeEsp = $pasajeroEspecial->Buscar($documento);
+
+            $pasajeroVIP = new PasajeroVIP();
+            $existeVIP = $pasajeroVIP->Buscar($documento);
+
+            if($existeEsp){
+                $pasajero = $pasajeroEsepcial;
+            } else if ($existeVIP){
+                $pasajero = $pasajeroVIP;
+            }
+        }
+        */
+
+        echo "\n";
+        if($existe){
+            echo "Pasajero encontrado:\n";
+            echo $pasajero;
+        } else {
+            echo "ERROR: el documento ingresado no corresponde a ningún pasajero en el sistema\n";
+            echo "Será redirigido al menú principal\n";
+        }
+        $menuActivo = "Principal";
+        detenerEjecucion();
+    }
+
+    if($menuActivo == "ModificarPasajero"){
+
+        echo "Ingrese el documento del pasajero que desea modificar sus datos: ";
+        $documento = trim(fgets(STDIN));
+        $pasajero = new Pasajero();
+        $existe = $pasajero->Buscar($documento);
+
+        echo "\n";
+        if($existe){
+
+            $viaje = new Viaje();
+            $idViaje = $pasajero->getIdViaje();
+            $viaje->Buscar($idViaje);
+
+            do {
+                $opcionMenu = menuModificarPasajero($empresaActiva);
+
+                switch($opcionMenu){
+                    // [1] Quitar el pasajero del viaje
+                    case 1:
+                        $pasajero = $viaje->mostrarPasajero($documento);
+                        $esPosible = $viaje->quitarPasajero($documento);
+                        echo "\n";
+    
+                        if($esPosible){
+                            echo "¡Pasajero quitado del viaje con éxito!\n";
+                            echo $pasajero."\n";
+                        } else {
+                            echo "ERROR: no se pudo quitar al pasajero del viaje\n";
+                        }
+                        $opcionMenu = 0;
+                        $menuActivo = "Principal";
+                        detenerEjecucion();
+                        break;
+                    // [2] Modificar el nombre de un pasajero
+                    case 2:
+                        $pasajero = $viaje->mostrarPasajero($documento);
+                        echo "\n";
+    
+                        if($pasajero != null){
+                            echo "Estado del pasajero:\n";
+                            echo $pasajero."\n\n";
+    
+                            echo "Ingrese el nuevo nombre que desea asignar al pasajero: ";
+                            $nombre = trim(fgets(STDIN));
+                            $viaje->modificarNombrePasajero($documento, $nombre);
+                            echo "\n";
+                            echo "¡Se modificó el nombre del pasajero con éxito!\n";
+                            echo $pasajero."\n";
+                        } else {
+                            echo "ERROR: no se pudo modificar el nombre del pasajero\n";
+                            echo "(no se encontro el documento ingresado en la base de datos)\n";
+                        }
+                        detenerEjecucion();
+                        break;
+                    // [3] Modificar el apellido de un pasajero
+                    case 3:
+                        $pasajero = $viaje->mostrarPasajero($documento);
+                        echo "\n";
+    
+                        if($pasajero != null){
+                            echo "Estado del pasajero:\n";
+                            echo $pasajero."\n\n";
+    
+                            echo "Ingrese el nuevo apellido que desea asignar al pasajero: ";
+                            $apellido = trim(fgets(STDIN));
+                            $viaje->modificarApellidoPasajero($documento, $apellido);
+                            echo "\n";
+                            echo "¡Se modificó el apellido del pasajero con éxito!\n";
+                            echo $pasajero."\n";
+                        } else {
+                            echo "ERROR: no se pudo modificar el apellido del pasajero\n";
+                            echo "(no se encontro el documento ingresado en la base de datos)\n";
+                        }
+                        detenerEjecucion();
+                        break;
+                    // [4] Modificar el número de teléfono de un pasajero
+                    case 4:
+                        $pasajero = $viaje->mostrarPasajero($documento);
+                        echo "\n";
+    
+                        if($pasajero != null){
+                            echo "Estado del pasajero:\n";
+                            echo $pasajero."\n\n";
+    
+                            echo "Ingrese el nuevo número de teléfono que desea asignar al pasajero: ";
+                            $numeroTelefono = trim(fgets(STDIN));
+                            $viaje->modificarTelefonoPasajero($documento, $numeroTelefono);
+                            echo "\n";
+                            echo "¡Se modificó el número de teléfono del pasajero con éxito!\n";
+                            echo $pasajero."\n";
+                        } else {
+                            echo "ERROR: no se pudo modificar el número de teléfono del pasajero\n";
+                            echo "(no se encontro el documento ingresado en la base de datos)\n";
+                        }
+                        detenerEjecucion();
+                        break;
+                    // [5] Modificar el número de asiento del pasajero
+                    case 5:
+                        if($viaje->hayPasajesDisponible()){
+                            $pasajero = $viaje->mostrarPasajero($documento);
+                            echo "\n";
+                            if($pasajero != null){    
+                                    echo $viaje->mostrarAsientosLibres()."\n";
+                                    echo "Estado del pasajero:\n";
+                                    echo $pasajero."\n\n";
+                                    echo "Ingrese el nuevo número de asiento que desea asignar al pasajero: ";
+                                    $numeroAsiento = trim(fgets(STDIN));
+                                    $esPosible = $viaje->modificarAsientoPasajero($documento, $numeroAsiento);
+                                    echo "\n";
+                                    if($esPosible){
+                                        echo $viaje->mostrarAsientosLibres()."\n";
+                                        echo "¡Se modificó el número asiento del pasajero con éxito!\n";
+                                        echo $pasajero."\n";
+                                    } else {
+                                        echo "ERROR: no se pudo modificar el número de asiento del pasajero\n";
+                                        if($numeroAsiento <= $viaje->getCantMaxPasajeros() && $numeroAsiento >= 1){
+                                            echo "(el número de asiento elegido ya se encuentra ocupado)\n";
+                                        }else{
+                                            echo "(no existe en el viaje el número de asiento elegido)\n";
+                                        }
+                                    }
+                            } else {
+                                echo "ERROR: no se pudo modificar el número de asiento del pasajero\n";
+                                echo "(no se encontro el documento ingresado en la base de datos)\n";
+                            }
+                        } else {
+                            echo "ERROR: no hay asientos disponibles para elegir en este viaje\n";
+                            echo "Será redirigido al menú principal\n";
+                        }
+                        detenerEjecucion();
+                        break;
+                    // [6] Modificar campos de un pasajero especial
+                    case 6:
+                        $pasajero = $viaje->mostrarPasajero($documento);
+                        echo "\n";
+
+                        if($pasajero != null){
+                            if($pasajero instanceof PasajeroEspecial){
+                                echo "Estado del pasajero:\n";
+                                echo $pasajero."\n\n";
+
+                                echo "Ingrese Si/No para cada servicio que desee actualizar\n";
+                                echo "(ignore los servicios que no desee modificar)\n\n";
+                                echo "Servicio de silla de ruedas: ";
+                                $servicioSilla = trim(fgets(STDIN));
+                                echo "Servicio de asistencia para embarque/desembarque: ";
+                                $servicioAsistencia = trim(fgets(STDIN));
+                                echo "Servicio de comida especial: ";
+                                $servicioComida = trim(fgets(STDIN));
+
+                                $viaje->modificarServiciosEspecialesPasajero(
+                                    $documento, $servicioSilla, $servicioAsistencia, $servicioComida);
+                                echo "\n";
+                                echo "Pasajero actualizado:\n";
+                                echo $pasajero."\n";
+
+                            } else {
+                                echo "ERROR: el número de documento ingresado no corresponde a un pasajero de tipo especial\n";
+                            }
+                        } else {
+                            echo "ERROR: el número de documento ingresado no existe en la base de datos\n";
+                        }
+                        detenerEjecucion();
+                        break;
+                    // [7] Modificar campos de un pasajero VIP
+                    case 7:
+                        $pasajero = $viaje->mostrarPasajero($documento);
+                        echo "\n";
+
+                        if($pasajero != null){
+                            if($pasajero instanceof PasajeroVIP){
+                                echo "Estado del pasajero:\n";
+                                echo $pasajero."\n\n"; 
+
+                                echo "Ingrese los nuevos valores para cada campo que desee actualizar\n";
+                                echo "(ignore los campos que no desee modificar)\n\n";
+                                echo "Ingrese un número de viajero frecuente: ";
+                                $nroViajeroFrecuente = trim(fgets(STDIN));
+                                do{
+                                    $permitido = true;
+                                    echo "Ingrese la nueva cantidad de millas (campo con validación): ";
+                                    $cantMillas = trim(fgets(STDIN));
+                                    if(!$cantMillas == ""){
+                                        if(!ctype_digit($cantMillas) || $cantMillas < 0){
+                                            $permitido = false;
+                                            echo "ERROR: valor ingresado para cantidad de millas inválido\n";
+                                        }
+                                    }
+                                } while (!$permitido);
+
+                                $viaje->modificarCamposVIPPasajero($documento, $nroViajeroFrecuente, $cantMillas);
+                                echo "\n";
+                                echo "Pasajero actualizado:\n";
+                                echo $pasajero."\n";
+
+                            } else {
+                                echo "ERROR: el número de documento ingresado no corresponde a un pasajero de tipo VIP\n";
+                            }
+                        } else {
+                            echo "ERROR: el número de documento ingresado no existe en la base de datos\n";
+                        }
+                        detenerEjecucion();
+                        break;
+                    // [0] Volver al menú principal
+                    case 0:
+                        $menuActivo = "Principal";
+                        break;
+                    default:
+                        break;
+                }
+
+            } while ($opcionMenu != 0);
+        } else {
+            echo "\n";
+            echo "ERROR: El documento ingresado no corresponde a ningún pasajero en la base de datos\n";
+            echo "Será redirigido al menú principal\n";
+            detenerEjecucion();
+            $menuActivo = "Principal";
+        }
+    }
+
+} while ($menuActivo != "Finalizar");
+
+echo "PROGRAMA FINALIZADO!\n";
+echo "\n";
 
 ?>

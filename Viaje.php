@@ -8,8 +8,10 @@ class Viaje{
     private $cantMaxPasajeros;
     private $colPasajeros;
     private $responsable;
+    private $empresa;
     private $costoPasaje;
     private $recaudacionTotal;
+    private $mensajeOperacion;
 
     // Estructura del arreglo de pasajeros:
     // $colPasajeros[numero] = [objPasajero];
@@ -17,23 +19,38 @@ class Viaje{
     //CONSTRUCTOR
     /**
      * Crea una instancia de la clase Viaje
-     * Recibe un código de viaje, un destino, la cantidad máxima de pasajeros del viaje,
-     * una colección de pasajeros, un responsable del viaje y el costo del pasaje
-     * 
+     */
+    public function __construct(){
+        $this->codigo = "";
+        $this->destino = "";
+        $this->cantMaxPasajeros = "";
+        $this->colPasajeros = [];
+        $this->responsable = null;
+        $this->empresa = null;
+        $this->costoPasaje = "";
+        $this->recaudacionTotal = "";
+        $this->mensajeOperacion = "";
+    }
+
+    /**
+     * Función que asigna los valores ingresados por párametro
+     * a los atributos del Viaje.
      * @param int $codigoNuevo
      * @param string $destinoNuevo
      * @param int $cantMax
      * @param array $colPasajeros
      * @param ResponsableV $responsable
+     * @param Empresa $empresa
      * @param float $costoPasaje
      */
-    public function __construct($codigoNuevo, $destinoNuevo, $cantMax, $colPasajeros, $responsable, $costoPasaje){
-        $this->codigo = $codigoNuevo;
-        $this->destino = $destinoNuevo;
-        $this->cantMaxPasajeros = $cantMax;
-        $this->colPasajeros = $colPasajeros;
-        $this->responsable = $responsable;
-        $this->costoPasaje = $costoPasaje;
+    public function cargar($codigo, $destino, $cantMax, $colPasajeros, $responsable, $empresa, $costoPasaje){
+        $this->setCodigo($codigo);
+        $this->setDestino($destino);
+        $this->setCantMaxPasajeros($cantMax);
+        $this->setColPasajeros($colPasajeros);
+        $this->setResponsable($responsable);
+        $this->setEmpresa($empresa);
+        $this->setCostoPasaje($costoPasaje);
         $this->actualizarRecaudacionTotal();
     }
 
@@ -87,6 +104,15 @@ class Viaje{
     }
 
     /**
+     * Devuelve el objeto de tipo Empresa al que pertenece el viaje
+     * 
+     * @return Empresa
+     */
+    public function getEmpresa(){
+        return $this->empresa;
+    }
+
+    /**
      * Devuelve un float que representa el costo del viaje por pasajero
      * 
      * @return float
@@ -102,6 +128,15 @@ class Viaje{
      */
     public function getRecaudacionTotal(){
         return $this->recaudacionTotal;
+    }
+
+    /**
+     * Devuelve el mensaje obtenido de realizar una operación en la base de datos
+     * 
+     * @return string
+     */
+    public function getMensajeOperacion(){
+        return $this->mensajeOperacion;
     }
 
     /*/=======================================================================================\*\
@@ -155,6 +190,15 @@ class Viaje{
     }
 
     /**
+     * Modifica el objeto de tipo Empresa al que pertenece el viaje
+     * 
+     * @param Empresa $empresa
+     */
+    public function setEmpresa($empresa){
+        $this->empresa = $empresa;
+    }
+
+    /**
      * Modifica el costo de viaje actual, recibe por parámetro un float
      * 
      * @param float $costoViaje
@@ -172,6 +216,15 @@ class Viaje{
         $this->recaudacionTotal = $recaudacionTotal;
     }
 
+    /**
+     *  Recibe un mensaje obtenido de realizar una operación en la base de datos
+     * 
+     * @param string $mensajeOperacion
+     */
+    public function setMensajeOperacion($mensajeOperacion){
+        $this->mensajeOperacion = $mensajeOperacion;
+    }
+
     /*/=======================================================================================\*\
     ||                                 PROPIOS DE LA CLASE                                     ||
     \*\=======================================================================================/*/
@@ -183,15 +236,20 @@ class Viaje{
      */
     public function __toString(){
         //string $viaje
-        $viaje = "Código de viaje: ".$this->getCodigo()."\n";
-        $viaje = $viaje ."Destino de viaje: ".$this->getDestino()."\n";
-        $viaje = $viaje ."Cantidad máxima de pasajeros permitida: ".$this->getCantMaxPasajeros()."\n";
-        $viaje = $viaje ."Responsable del viaje: ".$this->getResponsable()."\n";
-        $viaje = $viaje ."Costo de pasaje del viaje: $".$this->getCostoPasaje()."\n";
-        $viaje = $viaje. "Recaudación total del viaje: $".$this->getRecaudacionTotal()."\n";
-        $viaje = $viaje ."Pasajeros del viaje:\n\n";
-        $viaje = $viaje . $this->mostrarColPasajeros();
+        //int $idEmpresa
+        $idEmpresa = $this->getEmpresa()->getIdEmpresa();
 
+        $viaje = "[ID Viaje: ".$this->getCodigo()."]";
+        $viaje = $viaje ."[Destino : ".$this->getDestino()."]";
+        $viaje = $viaje ."[Cantidad máxima de pasajeros permitida: ".$this->getCantMaxPasajeros()."]\n";
+        $viaje = $viaje ."Responsable del viaje: ".$this->getResponsable()."\n";
+        $viaje = $viaje ."[ID Empresa: ".$idEmpresa."]";
+        $viaje = $viaje ."[Costo de pasaje: $".$this->getCostoPasaje()."]";
+        $viaje = $viaje. "[Recaudación total: $".$this->getRecaudacionTotal()."]\n\n";
+        $viaje = $viaje ." _______________________________| Pasajeros del viaje |_______________________________\n";
+        $viaje = $viaje ."|                                                                                     |\n";
+        $viaje = $viaje . $this->mostrarColPasajeros();
+        
         return $viaje;
     }
 
@@ -208,7 +266,7 @@ class Viaje{
             $cadenaPasajeros = "[Este viaje no tiene pasajeros cargados]\n";
         } else {
             for($i = 0; $i < count($this->getColPasajeros()); $i++){
-                $cadenaPasajeros = $cadenaPasajeros. "Pasajero N°". $i+1 ." ".($this->getColPasajeros()[$i])."\n\n";
+                $cadenaPasajeros = $cadenaPasajeros. "Pasajero N°". ($i+1) ." ".($this->getColPasajeros()[$i])."\n\n";
             }
         }
         return $cadenaPasajeros;
@@ -435,6 +493,35 @@ class Viaje{
     }
 
     /**
+     * Devuelve un arreglo con los números de asientos libres
+     * 
+     * @return array
+     */
+    public function arregloAsientosLibres(){
+        $posPasajero = 0;
+        $ultimoAsiento = $this->getCantMaxPasajeros();
+        $this->ordenarPasajerosPorAsiento();
+        $colPasajeros = $this->getColPasajeros();
+        $arregloAsiento = [];
+
+        for ($asiento = 1; $asiento <= $ultimoAsiento; $asiento++){
+
+            if($asiento <= $this->mayorAsientoOcupado()){
+                if($asiento == $colPasajeros[$posPasajero]->getNumeroAsiento()){
+                    $posPasajero++;
+                } else {
+                    $arregloAsiento[] = $asiento;
+                }
+            } else {
+                $arregloAsiento[] = $asiento;
+            }
+            
+        }
+
+        return $arregloAsiento;
+    }
+
+    /**
      * Ordena los pasajeros por número de asiento
      * 
      */
@@ -460,6 +547,7 @@ class Viaje{
                 $posAsiento--;
             }
         }
+
         $this->setColPasajeros($colOrdenada);
     }
 
@@ -483,6 +571,7 @@ class Viaje{
 
         if($pasajeDisponible && !$existeDocumento && !$asientoOcupado && 
         $numeroAsiento <= $this->getCantMaxPasajeros()){
+            $objPasajero->insertar();
             $this->agregarPasajero($objPasajero);
 
             $costoPasajeFinal = $this->valorFinalPasaje($objPasajero);
@@ -590,6 +679,9 @@ class Viaje{
             $recaudacionTotal = $recaudacionTotal + $costoPasaje;
         }
         $this->setRecaudacionTotal($recaudacionTotal);
+        if($this->getCodigo() != ""){
+            $this->modificar();
+        }
     }
 
     /**
@@ -640,6 +732,7 @@ class Viaje{
         if(count($colPasajeros) >= 1){
             $asiento = $colPasajeros[count($colPasajeros)-1]->getNumeroAsiento();
         }
+
         return $asiento;
     }
 
@@ -672,13 +765,17 @@ class Viaje{
     }
 
     /**
-     * Renueva la colección de pasajeros y actualiza la recaudación total
+     * Carga una nueva colección de pasajeros y actualiza la recaudación total
      * 
      * @param array $colPasajeros
      */
-    public function renovarPasajeros($colPasajeros){
+    public function cargaColPasajeros($colPasajerosNueva){
+
+        $colPasajeros = $this->getColPasajeros();
+        $colPasajeros = array_merge($colPasajerosNueva, $colPasajeros);
         $this->setColPasajeros($colPasajeros);
         $this->actualizarRecaudacionTotal();
+        
     }
 
     /**
@@ -686,6 +783,8 @@ class Viaje{
      * 
      */
     public function vaciarViaje(){
+        $pasajero = new Pasajero();
+        $pasajero->eliminarPasajerosPorIdViaje($this->getCodigo());
         $this->setColPasajeros([]);
         $this->setRecaudacionTotal(0);
     }
@@ -711,6 +810,8 @@ class Viaje{
         } else {
             $puedeQuitar = true;
             $colPasajerosAux = $this->getColPasajeros();
+
+            $colPasajerosAux[$posPasajero]->eliminar();
 
             $costoPasaje = $this->valorFinalPasaje($colPasajerosAux[$posPasajero]);
             $recaudacionTotal = $this->getRecaudacionTotal() - $costoPasaje;
@@ -746,6 +847,7 @@ class Viaje{
             $puedeModificar = true;
             $colPasajerosAux = $this->getColPasajeros();
             $colPasajerosAux[$posPasajero]->setNombre($nombreNuevo);
+            $colPasajerosAux[$posPasajero]->modificar();
             $this->setColPasajeros($colPasajerosAux);
         }
         return $puedeModificar;
@@ -773,6 +875,7 @@ class Viaje{
             $puedeModificar = true;
             $colPasajerosAux = $this->getColPasajeros();
             $colPasajerosAux[$posPasajero]->setApellido($apellidoNuevo);
+            $colPasajerosAux[$posPasajero]->modificar();
             $this->setColPasajeros($colPasajerosAux);
         }
         return $puedeModificar;
@@ -800,6 +903,7 @@ class Viaje{
             $puedeModificar = true;
             $colPasajerosAux = $this->getColPasajeros();
             $colPasajerosAux[$posPasajero]->setTelefono($telefonoNuevo);
+            $colPasajerosAux[$posPasajero]->modificar();
             $this->setColPasajeros($colPasajerosAux);
         }
         return $puedeModificar;
@@ -828,6 +932,7 @@ class Viaje{
             $puedeModificar = true;
             $colPasajerosAux = $this->getColPasajeros();
             $colPasajerosAux[$posPasajero]->setNumeroAsiento($asientoNuevo);
+            $colPasajerosAux[$posPasajero]->modificar();
             $this->setColPasajeros($colPasajerosAux);
         }
         return $puedeModificar;
@@ -891,6 +996,7 @@ class Viaje{
                 $colPasajeros[$posPasajero]->setReqSilla($reqSilla);
                 $colPasajeros[$posPasajero]->setReqAsistencia($reqAsistencia);
                 $colPasajeros[$posPasajero]->setReqComida($reqComida);
+                $colPasajeros[$posPasajero]->modificar();
 
                 $recaudacionTotal += $this->valorFinalPasaje($colPasajeros[$posPasajero]);
                 $this->setRecaudacionTotal($recaudacionTotal);
@@ -939,6 +1045,7 @@ class Viaje{
     
                 $colPasajeros[$posPasajero]->setNroViajeroFrecuente($nroViajeroFrecuente);
                 $colPasajeros[$posPasajero]->setCantMillas($cantMillas);
+                $colPasajeros[$posPasajero]->modificar();
 
                 $recaudacionTotal += $this->valorFinalPasaje($colPasajeros[$posPasajero]);
                 $this->setRecaudacionTotal($recaudacionTotal);
@@ -948,31 +1055,261 @@ class Viaje{
         return $puedeModificar;
     }
 
+    /*/=======================================================================================\*\
+    ||                            RELACIONADOS A LA BASE DE DATOS                              ||
+    \*\=======================================================================================/*/
+
     /**
-     * Modifica los datos del responsable del viaje según los parámetros recibidos
+	 * Recupera los datos de un viaje en la base de datos a partir de un código de viaje ingresado
+     * y los setea al objeto viaje actual.
+     * Retorna true si tiene éxito en la operación, false en caso contrario
      * 
-     * @param string $nombre
-     * @param string $apellido
-     * @param string $numeroLicencia
+	 * @param int $codigo
+	 * @return boolean
+	 */		
+    public function Buscar($codigo){
+		$base = new BaseDatos();
+		$consulta = "SELECT * FROM viaje WHERE idviaje = '".$codigo."'";
+		$exito = false;
+		if($base->Iniciar()){
+			if($base->Ejecutar($consulta)){
+				if($fila = $base->Registro()){	
+
+				    $this->setCodigo($codigo);
+                    $this->setDestino($fila['vdestino']);
+                    $this->setCantMaxPasajeros($fila['vcantmaxpasajeros']);
+
+                    $idResponsable = $fila['rnumeroempleado'];
+                    $responsable = new ResponsableV();
+                    $responsable->Buscar($idResponsable);
+                    if($responsable == false){
+                        $this->setResponsable(null);
+                    } else {
+                        $this->setResponsable($responsable);
+                    }
+
+                    $idEmpresa = $fila['idempresa'];
+                    $empresa = new Empresa();
+                    $empresa->Buscar($idEmpresa);
+                    if($empresa == false){
+                        $this->setEmpresa(null);
+                    } else {
+                        $this->setEmpresa($empresa);
+                    }
+                    
+                    $this->setCostoPasaje($fila['vimporte']);
+                    $this->setRecaudacionTotal($fila['vrecaudacion']);
+
+                    $pasajero = new Pasajero();
+                    $pasajeroEspecial = new PasajeroEspecial();
+                    $pasajeroVIP = new pasajeroVIP();
+
+                    $colPasajerosComunes = $pasajero->listar(
+                        "pasajero.idviaje = ".$codigo." AND NOT EXISTS (SELECT * FROM pasajeroespecial
+                        WHERE pasajeroespecial.pdocumento = pasajero.pdocumento)
+                        AND NOT EXISTS (SELECT * FROM pasajerovip
+                        WHERE pasajerovip.pdocumento = pasajero.pdocumento)"
+                    );
+                    $colPasajerosEspeciales = $pasajeroEspecial->listar(
+                        "pasajero.idviaje = ".$codigo.""
+                    );
+                    $colPasajerosVIP = $pasajeroVIP->listar(
+                        "pasajero.idviaje = ".$codigo.""
+                    );
+
+                    $colPasajeros = array_merge($colPasajerosComunes, $colPasajerosEspeciales, $colPasajerosVIP);
+
+                    $this->setColPasajeros($colPasajeros);
+
+					$exito = true;
+				}				
+		 	} else {
+                $this->setMensajeOperacion($base->getError());
+			}
+		} else {
+            $this->setMensajeOperacion($base->getError());	
+		}		
+		return $exito;
+	}
+
+    /**
+     * Busca todos los viajes que cumplan una condición y devuelve un arreglo
+     * que los contiene.
+     * 
+     * @param string $condicion
+     * @return array
      */
-    public function modificarResponsable($nombre, $apellido, $numeroLicencia){
-        //ResponsableV $responsable
+    public function listar($condicion){
+	    $colViajes = null;
+		$base = new BaseDatos();
+		$consulta = "SELECT * FROM viaje";
+		if ($condicion != ""){
+            $consulta = $consulta." WHERE ".$condicion;
+		}
+		$consulta.=" ORDER BY idviaje";
 
-        $responsable = $this->getResponsable();
+		if($base->Iniciar()){
+			if($base->Ejecutar($consulta)){				
+				$colViajes = array();
+				while($fila=$base->Registro()){
 
-        if($nombre != ""){
-            $responsable->setNombre($nombre);
-        }
-        if($apellido != ""){
-            $responsable->setApellido($apellido);
-        }
-        if($numeroLicencia != ""){
-            $responsable->setNumeroLicencia($numeroLicencia);
-        }
+                    $codigo = $fila['idviaje'];
+                    $destino = $fila['vdestino'];
+                    $cantMaxPasajeros = $fila['vcantmaxpasajeros'];
 
-        $this->setResponsable($responsable);
+                    $idResponsable = $fila['rnumeroempleado'];
+                    $responsable = new ResponsableV();
+                    $responsable->Buscar($idResponsable);
+                    if($responsable == false){
+                        $responsable = null;
+                    }
+
+                    $idEmpresa = $fila['idempresa'];
+                    $empresa = new Empresa();
+                    $empresa->Buscar($idEmpresa);
+                    if($empresa == false){
+                        $empresa = null;
+                    }
+
+                    $costoPasaje = $fila['vimporte'];
+
+                    $pasajero = new Pasajero();
+                    $colPasajeros = $pasajero->listar("pasajero.idviaje = ".$codigo);
+
+                    /*
+                    $pasajero = new Pasajero();
+                    $pasajeroEspecial = new PasajeroEspecial();
+                    $pasajeroVIP = new pasajeroVIP();
+
+                    $colPasajerosComunes = $pasajero->listar(
+                        "pasajero.idviaje = ".$codigo." AND NOT EXISTS (SELECT * FROM pasajeroespecial
+                        WHERE pasajeroespecial.pdocumento = pasajero.pdocumento)
+                        AND NOT EXISTS (SELECT * FROM pasajerovip
+                        WHERE pasajerovip.pdocumento = pasajero.pdocumento)"
+                    );
+                    $colPasajerosEspeciales = $pasajeroEspecial->listar(
+                        "pasajero.idviaje = ".$codigo.""
+                    );
+                    $colPasajerosVIP = $pasajeroVIP->listar(
+                        "pasajero.idviaje = ".$codigo.""
+                    );
+
+                    $colPasajeros = array_merge($colPasajerosComunes, $colPasajerosEspeciales, $colPasajerosVIP);
+                    */
+
+
+					$viaje = new Viaje();
+					$viaje->cargar($codigo, $destino, $cantMaxPasajeros, $colPasajeros, $responsable, $empresa, $costoPasaje);
+					array_push($colViajes, $viaje);
+				}
+		 	} else {
+                $this->setMensajeOperacion($base->getError());	
+			}
+		} else {
+            $this->setMensajeOperacion($base->getError());
+		}	
+		return $colViajes;
+	}
+
+    /**
+     * Inserta un nuevo viaje a la base de datos según los datos actuales almacenados
+     * en los atributos del objeto Viaje.
+     * Retorna true si tiene éxito en la operación, false en caso contrario
+     * 
+     * @return boolean
+     */
+    public function insertar(){
+		$base = new BaseDatos();
+		$exito = false;
+
+        $idEmpresa = $this->getEmpresa()->getIdEmpresa();
+        $idResponsable = $this->getResponsable()->getNumeroEmpleado();
+
+		$consulta = "INSERT INTO viaje(vdestino, vcantmaxpasajeros, idempresa, rnumeroempleado, vimporte, vrecaudacion) 
+        VALUES ('".$this->getDestino()."', ".$this->getCantMaxPasajeros().", ".
+        $idEmpresa.", ".$idResponsable.", ".$this->getCostoPasaje().", ".$this->getRecaudacionTotal().")";
+
+		if($base->Iniciar()){
+
+            if($id = $base->devuelveIDInsercion($consulta)){
+                $this->setCodigo($id);
+			    $exito = true;
+			} else {
+                $this->setMensajeOperacion($base->getError());
+            }
+		} else {
+            $this->setMensajeOperacion($base->getError());
+		}
+		return $exito;
+	}
+
+    /**
+     * Modifica todos los campos del viaje actual (identificado por su código de viaje)
+     * en la base de datos según el estado actual de todos sus atributos.
+     * Previamente se tuvo que hacer un set a cada atributo a modificar.
+     * Retorna true si tiene éxito en la operación, false en caso contrario
+     * 
+     * @return boolean
+     */
+    public function modificar(){
+	    $exito = false; 
+	    $base = new BaseDatos();
+
+        $idEmpresa = $this->getEmpresa()->getIdEmpresa();
+        $idResponsable = $this->getResponsable()->getNumeroEmpleado();
+
+		$consulta = "UPDATE viaje SET idviaje = ".$this->getCodigo().
+        ", vdestino = '".$this->getDestino()."', vcantmaxpasajeros = ".$this->getCantMaxPasajeros().
+        ", idempresa = ".$idEmpresa.", rnumeroempleado = ".$idResponsable.", vimporte = ".$this->getCostoPasaje().
+        ", vrecaudacion = ".$this->getRecaudacionTotal().
+        " WHERE idviaje = ".$this->getCodigo();
+
+		if($base->Iniciar()){
+			if($base->Ejecutar($consulta)){
+			    $exito =  true;
+			} else {
+                $this->setMensajeOperacion($base->getError());
+            }
+		} else {
+            $this->setMensajeOperacion($base->getError());	
+		}
+		return $exito;
+	}
+
+    /**
+     * Elimina un viaje de la base de datos según su código de viaje.
+     * Lee el código de viaje del Viaje actual y lo envía en la consulta.
+     * Retorna true si tiene éxito en la operación, false en caso contrario
+     * 
+     * @return boolean
+     */
+    public function eliminar(){
+		$base = new BaseDatos();
+		$exito = false;
+		if($base->Iniciar()){
+            $consulta = "DELETE FROM viaje WHERE idviaje = ".$this->getCodigo().";";
+            if($base->Ejecutar($consulta)){
+                $exito = true;
+			} else {
+                $this->setMensajeOperacion($base->getError());
+            }
+		} else {
+            $this->setMensajeOperacion($base->getError());	
+		}
+		return $exito; 
+	}
+
+    /**
+     * Elimina el viaje
+     */
+    public function eliminarViaje(){
+        $colPasajeros = $this->getColPasajeros();
+
+        for($i = 0; $i < count($colPasajeros); $i++){
+            $colPasajeros[$i]->eliminar();
+        }
+        $this->eliminar();
     }
-
 }
 
 ?>
