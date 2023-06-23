@@ -2,8 +2,6 @@
 
 include_once "ResponsableV.php";
 include_once "Pasajero.php";
-include_once "PasajeroEspecial.php";
-include_once "PasajeroVIP.php";
 include_once "Viaje.php";
 include_once "Empresa.php";
 include_once "BaseDatos.php";
@@ -532,8 +530,6 @@ function menuModificarPasajero($empresaActiva){
         echo "|| [3] Modificar el apellido del pasajero                                          ||\n";
         echo "|| [4] Modificar el número de teléfono del pasajero                                ||\n";
         echo "|| [5] Modificar el número de asiento del pasajero                                 ||\n";
-        echo "|| [6] Modificar campos de pasajero especial                                       ||\n";
-        echo "|| [7] Modificar campos de pasajero VIP                                            ||\n";
         echo "||                                                                                 ||\n";
         echo "|| [0] Volver al menú principal                                                    ||\n";
         echo "=====================================================================================\n";
@@ -542,11 +538,11 @@ function menuModificarPasajero($empresaActiva){
         $opcionElegida = trim(fgets(STDIN));
         
         // OBSERVAR: el rango varía según cantidad de opciones
-        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 7){
+        if(!ctype_digit($opcionElegida) || $opcionElegida < 0 || $opcionElegida > 5){
             mensajeFueraDeRango();
         }
     // OBSERVAR: el rango varía según cantidad de opciones
-    } while ($opcionElegida < 0 || $opcionElegida > 7);
+    } while ($opcionElegida < 0 || $opcionElegida > 5);
     echo "\n";
     return $opcionElegida;
 }
@@ -1060,81 +1056,9 @@ function crearPasajero($idViaje, $ultimoTicket){
 
     $numeroAsiento = (int)$numeroAsiento;
     $ultimoTicket++;
-
-    do{
-        $permitido = true;
-        echo "=====================================================================================\n";
-        echo "||             Indique que tipo de pasaje desea adquirir ingresando:               ||\n";
-        echo "||                                                                                 ||\n";
-        echo "|| [1] Pasaje estandar                                                             ||\n";
-        echo "|| [2] Pasaje VIP                                                                  ||\n";
-        echo "|| [3] Pasaje con servicio especiales                                              ||\n";
-        echo "=====================================================================================\n";
-        echo "Opcion elegida: ";
-        $opcionElegida = trim(fgets(STDIN));
-
-        switch($opcionElegida){
-            case 1:
-                $pasajero = new Pasajero();
-                $pasajero->cargar($nombre, $apellido, $documento, $telefono, $numeroAsiento, $ultimoTicket, $idViaje);
-                break;
-            case 2:
-                echo "Ingrese su número de viajero frecuente: ";
-                $nroViajeroFrecuente = trim(fgets(STDIN));
-                do{
-                    $permitido = true;
-                    echo "Ingrese la cantidad de millas (campo con validación): ";
-                    $cantMillas = trim(fgets(STDIN));
-                    if(!ctype_digit($cantMillas) || $cantMillas < 0){
-                        $permitido = false;
-                        echo "ERROR: valor ingresado para cantidad de millas inválido\n";
-                    }
-                } while (!$permitido);
-                $cantMillas = (int)$cantMillas;
-                $pasajero = new PasajeroVIP();
-                $pasajero->cargarSub($nombre, $apellido, $documento, $telefono, 
-                $numeroAsiento, $ultimoTicket, $idViaje, $nroViajeroFrecuente, $cantMillas);
-                break;
-            case 3:
-                echo "Ingrese \"SI\" para los servicios que desea contratar\n";
-                echo "Servicio de silla de ruedas: ";
-                $servicioSilla = trim(fgets(STDIN));
-                echo "Servicio de asistencia para embarque/desembarque: ";
-                $servicioAsistencia = trim(fgets(STDIN));
-                echo "Servicio de comida especial: ";
-                $servicioComida = trim(fgets(STDIN));
-
-                $reqSilla = false;
-                $reqAsistencia = false;
-                $reqComida = false;
-
-                if(strtolower($servicioSilla) == "si"){
-                    $reqSilla = true;
-                }
-                if(strtolower($servicioAsistencia) == "si"){
-                    $reqAsistencia = true;
-                }
-                if(strtolower($servicioComida) == "si"){
-                    $reqComida = true;
-                }
-
-                if(!$reqSilla && !$reqAsistencia && !$reqComida){
-                    $pasajero = new Pasajero();
-                    $pasajero->cargar($nombre, $apellido, $documento, $telefono, $numeroAsiento, $ultimoTicket, $idViaje);
-                } else {
-                    $pasajero = new PasajeroEspecial();
-                    $pasajero->cargarSub($nombre, $apellido, $documento, $telefono, 
-                    $numeroAsiento, $ultimoTicket, $idViaje, $reqSilla, $reqAsistencia, $reqComida);
-                }
-
-                break;
-            default:
-                $permitido = false;
-                mensajeFueraDeRango();
-                break;
-        }
-
-    }while (!$permitido);
+    
+    $pasajero = new Pasajero();
+    $pasajero->cargar($nombre, $apellido, $documento, $telefono, $numeroAsiento, $ultimoTicket, $idViaje);
 
     return $pasajero;
 }
@@ -1166,7 +1090,6 @@ function crearResponsable(){
  * 
  * @param int $cantPasajeros
  * @param array $colAsientos
- * @param string $maxDocumento
  * @param int $ultimoTicket
  * @param int $idViaje
  * 
@@ -1202,52 +1125,11 @@ function crearColeccionPasajerosAutomatica($cantPasajeros, $colAsientos, $ultimo
         $colAsientos = array_values($colAsientos);
 
         $ultimoTicket ++;
-
-        $tipoPasajero = random_int(1, 10);
-
-        if($tipoPasajero == 1){
-            $nroViajeroFrecuente = random_int(1000, 9999);
-            $cantMillas = random_int(10, 1000);
-            $cantMillas = (int)$cantMillas;
-
-            $colPasajeros[$i] = new PasajeroVIP();
-            $colPasajeros[$i]->cargar($nombre, $apellido, $documento,
-            $telefono, $numeroAsiento, $ultimoTicket, $idViaje, $nroViajeroFrecuente, $cantMillas);
-            $colPasajeros[$i]->insertar();
-
-        }else if($tipoPasajero == 2 || $tipoPasajero == 3){
-            if(random_int(1, 3) == 1){
-                $reqSilla = true;
-            }else{
-                $reqSilla = false;
-            }
-            if(random_int(1, 3) == 1){
-                $reqAsistencia = true;
-            }else{
-                $reqAsistencia = false;
-            }
-            if(random_int(1, 3) == 1){
-                $reqComida = true;
-            }else{
-                $reqComida = false;
-            }
-            if(!$reqSilla && !$reqAsistencia && !$reqComida){
-                $reqComida = true;
-            }
-
-            $colPasajeros[$i] = new PasajeroEspecial();
-            $colPasajeros[$i]->cargar($nombre, $apellido, $documento,
-            $telefono, $numeroAsiento, $ultimoTicket, $idViaje, $reqSilla, $reqAsistencia, $reqComida);
-            $colPasajeros[$i]->insertar();
-
-        }else{
-
-            $colPasajeros[$i] = new Pasajero();
-            $colPasajeros[$i]->cargar($nombre, $apellido, $documento,
-            $telefono, $numeroAsiento, $ultimoTicket, $idViaje);
-            $colPasajeros[$i]->insertar();
-
-        }
+        
+        $colPasajeros[$i] = new Pasajero();
+        $colPasajeros[$i]->cargar($nombre, $apellido, $documento,
+        $telefono, $numeroAsiento, $ultimoTicket, $idViaje);
+        $colPasajeros[$i]->insertar();
     }
 
     return $colPasajeros;
@@ -1961,7 +1843,7 @@ do {
         if(count($empresaActiva->getColViajes()) != 0){
 
             echo "\n";
-            echo "Ingrese el código de viaje del cual desea vender un pasaje: ";
+            echo "Ingrese el código del viaje del cual desea vender un pasaje: ";
             $idViaje = trim(fgets(STDIN));
             $viaje = new Viaje();
             $existe = $viaje->Buscar($idViaje);
@@ -2031,7 +1913,7 @@ do {
         if(count($empresaActiva->getColViajes()) != 0){
 
             echo "\n";
-            echo "Ingrese el código de viaje del cual desea vender un pasaje: ";
+            echo "Ingrese el código del viaje del cual desea vender pasajes: ";
             $idViaje = trim(fgets(STDIN));
             $viaje = new Viaje();
             $existe = $viaje->Buscar($idViaje);
@@ -2042,13 +1924,13 @@ do {
                 $pasajero = new Pasajero();
                 $maxDocumento = $pasajero->maximoDocumento();
 
-                echo "Ingrese la cantidad de pasajeros aleatorios que desea crear: ";
+                echo "Ingrese la cantidad de pasajes que desea vender: ";
                 $cantPasajeros = (trim(fgets(STDIN)));
                 echo "\n";
                 if (!ctype_digit($cantPasajeros) || $cantPasajeros < 0 ){
-                    echo "ERROR: valor no válido para cantidad de pasajeros\n";
+                    echo "ERROR: valor no válido para cantidad de pasajes\n";
                 } else if($cantPasajeros > $asientosDisponibles){
-                    echo "ERROR: la cantidad de pasajeros ingresada excede la capacidad máxima del viaje\n";
+                    echo "ERROR: la cantidad de pasajes ingresada para vender excede la capacidad máxima del viaje\n";
                 } else {
                     $colAsientos = $viaje->arregloAsientosLibres();
                     $colPasajeros = crearColeccionPasajerosAutomatica(
@@ -2056,7 +1938,7 @@ do {
 
                     $ultimoTicket += $cantPasajeros;
                     $viaje->cargaColPasajeros($colPasajeros);
-                    echo "¡Carga automática de pasajeros realizada con éxito!\n";
+                    echo "¡Venta automática de pasajes realizada con éxito!\n";
                 }
             } else {
                 echo "\n";
@@ -2076,22 +1958,6 @@ do {
         $documento = trim(fgets(STDIN));
         $pasajero = new Pasajero();
         $existe = $pasajero->Buscar($documento);
-
-        /*
-        if($existe){
-            $pasajeroEspecial = new PasajeroEspecial();
-            $existeEsp = $pasajeroEspecial->Buscar($documento);
-
-            $pasajeroVIP = new PasajeroVIP();
-            $existeVIP = $pasajeroVIP->Buscar($documento);
-
-            if($existeEsp){
-                $pasajero = $pasajeroEsepcial;
-            } else if ($existeVIP){
-                $pasajero = $pasajeroVIP;
-            }
-        }
-        */
 
         echo "\n";
         if($existe){
@@ -2234,78 +2100,6 @@ do {
                         } else {
                             echo "ERROR: no hay asientos disponibles para elegir en este viaje\n";
                             echo "Será redirigido al menú principal\n";
-                        }
-                        detenerEjecucion();
-                        break;
-                    // [6] Modificar campos de un pasajero especial
-                    case 6:
-                        $pasajero = $viaje->mostrarPasajero($documento);
-                        echo "\n";
-
-                        if($pasajero != null){
-                            if($pasajero instanceof PasajeroEspecial){
-                                echo "Estado del pasajero:\n";
-                                echo $pasajero."\n\n";
-
-                                echo "Ingrese Si/No para cada servicio que desee actualizar\n";
-                                echo "(ignore los servicios que no desee modificar)\n\n";
-                                echo "Servicio de silla de ruedas: ";
-                                $servicioSilla = trim(fgets(STDIN));
-                                echo "Servicio de asistencia para embarque/desembarque: ";
-                                $servicioAsistencia = trim(fgets(STDIN));
-                                echo "Servicio de comida especial: ";
-                                $servicioComida = trim(fgets(STDIN));
-
-                                $viaje->modificarServiciosEspecialesPasajero(
-                                    $documento, $servicioSilla, $servicioAsistencia, $servicioComida);
-                                echo "\n";
-                                echo "Pasajero actualizado:\n";
-                                echo $pasajero."\n";
-
-                            } else {
-                                echo "ERROR: el número de documento ingresado no corresponde a un pasajero de tipo especial\n";
-                            }
-                        } else {
-                            echo "ERROR: el número de documento ingresado no existe en la base de datos\n";
-                        }
-                        detenerEjecucion();
-                        break;
-                    // [7] Modificar campos de un pasajero VIP
-                    case 7:
-                        $pasajero = $viaje->mostrarPasajero($documento);
-                        echo "\n";
-
-                        if($pasajero != null){
-                            if($pasajero instanceof PasajeroVIP){
-                                echo "Estado del pasajero:\n";
-                                echo $pasajero."\n\n"; 
-
-                                echo "Ingrese los nuevos valores para cada campo que desee actualizar\n";
-                                echo "(ignore los campos que no desee modificar)\n\n";
-                                echo "Ingrese un número de viajero frecuente: ";
-                                $nroViajeroFrecuente = trim(fgets(STDIN));
-                                do{
-                                    $permitido = true;
-                                    echo "Ingrese la nueva cantidad de millas (campo con validación): ";
-                                    $cantMillas = trim(fgets(STDIN));
-                                    if(!$cantMillas == ""){
-                                        if(!ctype_digit($cantMillas) || $cantMillas < 0){
-                                            $permitido = false;
-                                            echo "ERROR: valor ingresado para cantidad de millas inválido\n";
-                                        }
-                                    }
-                                } while (!$permitido);
-
-                                $viaje->modificarCamposVIPPasajero($documento, $nroViajeroFrecuente, $cantMillas);
-                                echo "\n";
-                                echo "Pasajero actualizado:\n";
-                                echo $pasajero."\n";
-
-                            } else {
-                                echo "ERROR: el número de documento ingresado no corresponde a un pasajero de tipo VIP\n";
-                            }
-                        } else {
-                            echo "ERROR: el número de documento ingresado no existe en la base de datos\n";
                         }
                         detenerEjecucion();
                         break;

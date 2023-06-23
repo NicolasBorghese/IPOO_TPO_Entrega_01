@@ -42,23 +42,5 @@ CREATE TABLE pasajero (
 	pnumeroticket bigint,
     PRIMARY KEY (pdocumento),
 	FOREIGN KEY (idviaje) REFERENCES viaje (idviaje)	
-    )ENGINE=InnoDB DEFAULT CHARSET=utf8; 
- 
-  
-CREATE TABLE pasajeroespecial (
-	pdocumento bigint,
-	preqsilla varchar(15),
-	preqasistencia varchar(15),
-	preqcomida varchar(15),
-	PRIMARY KEY (pdocumento),
-	FOREIGN KEY (pdocumento) REFERENCES pasajero(pdocumento) on update CASCADE on delete CASCADE
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
-	
-CREATE TABLE pasajerovip (
-	pdocumento bigint,
-	nroviajerofrecuente varchar(15),
-	cantmillas float,
-	PRIMARY KEY (pdocumento),
-	FOREIGN KEY (pdocumento) REFERENCES pasajero(pdocumento) on update CASCADE on delete CASCADE
-	) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+    )ENGINE=InnoDB DEFAULT CHARSET=utf8;
 	

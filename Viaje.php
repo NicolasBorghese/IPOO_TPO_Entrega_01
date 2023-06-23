@@ -938,123 +938,6 @@ class Viaje{
         return $puedeModificar;
     }
 
-    /**
-     * Busca un pasajero especial por su número de documento dentro del viaje, si existe
-     * modifica los campos de pasajero especial según los datos recibidos por parámetro
-     * y actualiza la recaudación total del viaje
-     * Retorna true si es posible, false en caso contrario
-     * 
-     * @param string $documento
-     * @param string $servicioSilla
-     * @param string $servicioAsistencia
-     * @param string $servicioComida
-     * @return boolean
-     */
-    public function modificarServiciosEspecialesPasajero(
-        $documento, $servicioSilla, $servicioAsistencia, $servicioComida){
-        //int $posPasajero
-        //float $recaudacionTotal
-        //boolean $reqSilla, $reqAsistencia, $reqComida, $puedeModificar
-        //array $colPasajeros
-
-        $puedeModificar = false;
-        $posPasajero = $this->buscaPasajero($documento);
-
-        if($posPasajero != -1){
-            $colPasajeros = $this->getColPasajeros();
-
-            if($colPasajeros[$posPasajero] instanceof PasajeroEspecial){
-
-                $puedeModificar = true;
-                $recaudacionTotal = $this->getRecaudacionTotal();
-                $recaudacionTotal -= $this->valorFinalPasaje($colPasajeros[$posPasajero]);
-
-                if(strtolower($servicioSilla) == "si"){
-                    $reqSilla = true;
-                } else if (strtolower($servicioSilla) == "no"){
-                    $reqSilla = false;
-                } else {
-                    $reqSilla = $colPasajeros[$posPasajero]->getReqSilla();
-                }
-    
-                if(strtolower($servicioAsistencia) == "si"){
-                    $reqAsistencia = true;
-                } else if (strtolower($servicioAsistencia) == "no"){
-                    $reqAsistencia = false;
-                } else {
-                    $reqAsistencia = $colPasajeros[$posPasajero]->getReqAsistencia();
-                }
-    
-                if(strtolower($servicioComida) == "si"){
-                    $reqComida = true;
-                } else if (strtolower($servicioComida) == "no"){
-                    $reqComida = false;
-                } else {
-                    $reqComida = $colPasajeros[$posPasajero]->getReqComida();
-                }
-    
-                $colPasajeros[$posPasajero]->setReqSilla($reqSilla);
-                $colPasajeros[$posPasajero]->setReqAsistencia($reqAsistencia);
-                $colPasajeros[$posPasajero]->setReqComida($reqComida);
-                $colPasajeros[$posPasajero]->modificar();
-
-                $recaudacionTotal += $this->valorFinalPasaje($colPasajeros[$posPasajero]);
-                $this->setRecaudacionTotal($recaudacionTotal);
-                $this->setColPasajeros($colPasajeros);
-            }
-        }
-        return $puedeModificar;
-    }
-
-    /**
-     * Busca un pasajero VIP por su número de documento dentro del viaje, si existe
-     * modifica los campos de pasajero VIP según los datos recibidos por parámetro
-     * y actualiza la recaudación total del viaje
-     * Retorna true si es posible, false en caso contrario
-     * 
-     * @param string $documento
-     * @param string $nroViajeroFrecuente
-     * @param int $cantMillas
-     * @return boolean
-     */
-    public function modificarCamposVIPPasajero(
-        $documento, $nroViajeroFrecuente, $cantMillas){
-        //int $posPasajero
-        //float $recaudacionTotal
-        //boolean $puedeModificar
-        //array $colPasajeros
-
-        $puedeModificar = false;
-        $posPasajero = $this->buscaPasajero($documento);
-
-        if($posPasajero != -1){
-            $colPasajeros = $this->getColPasajeros();
-
-            if($colPasajeros[$posPasajero] instanceof PasajeroVIP){
-
-                $puedeModificar = true;
-                $recaudacionTotal = $this->getRecaudacionTotal();
-                $recaudacionTotal -= $this->valorFinalPasaje($colPasajeros[$posPasajero]);
-
-                if($nroViajeroFrecuente == ""){
-                    $nroViajeroFrecuente = $colPasajeros[$posPasajero]->getNroViajeroFrecuente();
-                }
-                if(!ctype_digit($cantMillas) || $cantMillas < 0){
-                    $cantMillas = $colPasajeros[$posPasajero]->getCantMillas();
-                }
-    
-                $colPasajeros[$posPasajero]->setNroViajeroFrecuente($nroViajeroFrecuente);
-                $colPasajeros[$posPasajero]->setCantMillas($cantMillas);
-                $colPasajeros[$posPasajero]->modificar();
-
-                $recaudacionTotal += $this->valorFinalPasaje($colPasajeros[$posPasajero]);
-                $this->setRecaudacionTotal($recaudacionTotal);
-                $this->setColPasajeros($colPasajeros);
-            }
-        }
-        return $puedeModificar;
-    }
-
     /*/=======================================================================================\*\
     ||                            RELACIONADOS A LA BASE DE DATOS                              ||
     \*\=======================================================================================/*/
@@ -1101,24 +984,7 @@ class Viaje{
                     $this->setRecaudacionTotal($fila['vrecaudacion']);
 
                     $pasajero = new Pasajero();
-                    $pasajeroEspecial = new PasajeroEspecial();
-                    $pasajeroVIP = new pasajeroVIP();
-
-                    $colPasajerosComunes = $pasajero->listar(
-                        "pasajero.idviaje = ".$codigo." AND NOT EXISTS (SELECT * FROM pasajeroespecial
-                        WHERE pasajeroespecial.pdocumento = pasajero.pdocumento)
-                        AND NOT EXISTS (SELECT * FROM pasajerovip
-                        WHERE pasajerovip.pdocumento = pasajero.pdocumento)"
-                    );
-                    $colPasajerosEspeciales = $pasajeroEspecial->listar(
-                        "pasajero.idviaje = ".$codigo.""
-                    );
-                    $colPasajerosVIP = $pasajeroVIP->listar(
-                        "pasajero.idviaje = ".$codigo.""
-                    );
-
-                    $colPasajeros = array_merge($colPasajerosComunes, $colPasajerosEspeciales, $colPasajerosVIP);
-
+                    $colPasajeros = $pasajero->listar("pasajero.idviaje = ".$codigo);
                     $this->setColPasajeros($colPasajeros);
 
 					$exito = true;
@@ -1175,28 +1041,6 @@ class Viaje{
 
                     $pasajero = new Pasajero();
                     $colPasajeros = $pasajero->listar("pasajero.idviaje = ".$codigo);
-
-                    /*
-                    $pasajero = new Pasajero();
-                    $pasajeroEspecial = new PasajeroEspecial();
-                    $pasajeroVIP = new pasajeroVIP();
-
-                    $colPasajerosComunes = $pasajero->listar(
-                        "pasajero.idviaje = ".$codigo." AND NOT EXISTS (SELECT * FROM pasajeroespecial
-                        WHERE pasajeroespecial.pdocumento = pasajero.pdocumento)
-                        AND NOT EXISTS (SELECT * FROM pasajerovip
-                        WHERE pasajerovip.pdocumento = pasajero.pdocumento)"
-                    );
-                    $colPasajerosEspeciales = $pasajeroEspecial->listar(
-                        "pasajero.idviaje = ".$codigo.""
-                    );
-                    $colPasajerosVIP = $pasajeroVIP->listar(
-                        "pasajero.idviaje = ".$codigo.""
-                    );
-
-                    $colPasajeros = array_merge($colPasajerosComunes, $colPasajerosEspeciales, $colPasajerosVIP);
-                    */
-
 
 					$viaje = new Viaje();
 					$viaje->cargar($codigo, $destino, $cantMaxPasajeros, $colPasajeros, $responsable, $empresa, $costoPasaje);
