@@ -1162,7 +1162,6 @@ if(count($colEmpresas) == 0){
 } else {
     $empresaActiva = $colEmpresas[0];
 }
-$empresaActiva->actualizarColViajes();
 
 $pasajero = new Pasajero();
 $maxDocumento = $pasajero->maximoDocumento();
@@ -1181,7 +1180,6 @@ do {
         $empresaActiva = sinEmpresasEnSistema($empresaActiva);
         $colEmpresas = $empresaActiva->listar("");
         $empresaActiva = $colEmpresas[0];
-        $empresaActiva->actualizarColViajes();
     }
     
     if($menuActivo == "Principal"){
@@ -1349,8 +1347,14 @@ do {
             // [3] Eliminar empresa
             case 3:
                 $empresaActiva->eliminarEmpresa();
-                echo "Empresa eliminada con éxito!";
-                echo "\n";
+                echo "Empresa eliminada con éxito!\n";
+
+                $colEmpresas = $empresaActiva->listar("");
+                if(count($colEmpresas) != 0){
+                $empresaActiva = $colEmpresas[0];
+                $empresaActiva->actualizarColViajes();
+                }
+                $menuActivo = "Principal";
                 detenerEjecucion();
             // [0] Volver al menú principal
             case 0:
