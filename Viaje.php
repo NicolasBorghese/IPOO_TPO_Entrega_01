@@ -1015,9 +1015,11 @@ class Viaje{
 		$consulta.=" ORDER BY idviaje";
 
 		if($base->Iniciar()){
-			if($base->Ejecutar($consulta)){				
+			if($base->Ejecutar($consulta)){	
+                			
 				$colViajes = array();
-				while($fila=$base->Registro()){
+
+				while($fila = $base->Registro()){
 
                     $codigo = $fila['idviaje'];
                     $destino = $fila['vdestino'];

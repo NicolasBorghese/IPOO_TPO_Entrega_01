@@ -228,8 +228,10 @@ class ResponsableV{
 		$consulta.=" ORDER BY rnumeroempleado";
 
 		if($base->Iniciar()){
-			if($base->Ejecutar($consulta)){				
+			if($base->Ejecutar($consulta)){	
+
 				$colResponsables = array();
+                
 				while($fila=$base->Registro()){
 					
 					$numeroEmpleado = $fila['rnumeroempleado'];
@@ -295,7 +297,7 @@ class ResponsableV{
 
 		if($base->Iniciar()){
 			if($base->Ejecutar($consulta)){
-			    $exito =  true;
+			    $exito = true;
 			} else {
                 $this->setMensajeOperacion($base->getError());
             }

@@ -287,8 +287,10 @@ class Pasajero{
 		$consulta.=" ORDER BY pdocumento";
 
 		if($base->Iniciar()){
-			if($base->Ejecutar($consulta)){				
+			if($base->Ejecutar($consulta)){	
+
 				$colPasajeros = array();
+
 				while($fila = $base->Registro()){
 					
 					$documento = $fila['pdocumento'];
@@ -359,7 +361,7 @@ class Pasajero{
 
 		if($base->Iniciar()){
 			if($base->Ejecutar($consulta)){
-			    $exito =  true;
+			    $exito = true;
 			} else {
                 $this->setMensajeOperacion($base->getError());
             }

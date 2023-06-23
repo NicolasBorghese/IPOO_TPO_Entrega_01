@@ -213,7 +213,8 @@ class Empresa{
 	}
 
     /**
-     * Debido a un bug de recursion infinito se actualiza la colección de viajes aparte
+     * Debido a un bug de recursion infinito al utilizar el Buscar de esta clase 
+     * se actualiza la colección de viajes aparte
      */
     public function actualizarColViajes(){
         $viaje = new Viaje();
@@ -238,7 +239,8 @@ class Empresa{
 		$consulta.=" ORDER BY idempresa";
 
 		if($base->Iniciar()){
-			if($base->Ejecutar($consulta)){				
+			if($base->Ejecutar($consulta)){
+                				
 				$colEmpresas = array();
 
 				while($fila = $base->Registro()){
