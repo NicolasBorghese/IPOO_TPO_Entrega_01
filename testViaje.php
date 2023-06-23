@@ -637,7 +637,7 @@ function visualizarIDsViajes($empresaActiva){
     if(count($colViajes) == 0){
         $cadena = $cadena. "[Esta empresa no tiene viajes cargados en la base de datos]\n";
     } else {
-        $cadena = $cadena. "IDs de viajes correspondientes a la empresa activa [ID empresa: ".$idEmpresa."][Nombre: ".$nombreEmpresa."]\n";
+        $cadena = $cadena. "IDs de viajes correspondientes a la empresa activa [ID empresa: ".$idEmpresa."][Nombre: ".$nombreEmpresa."]\n\n";
         for($i = 0; $i < count($colViajes); $i++){
             $cadena = $cadena."[ID viaje: ".$colViajes[$i]->getCodigo() ."][Destino: ".$colViajes[$i]->getDestino().
             "][Costo de pasaje sin impuestos: $".$colViajes[$i]->getCostoPasaje().
@@ -662,7 +662,7 @@ function visualizarIDsResponsables(){
     if(count($colResponsables) == 0){
         $cadena = $cadena. "[Este sistema no tiene responsables cargados en la base de datos]\n";
     } else {
-        $cadena = $cadena. "IDs de responsables en sistema:\n";
+        $cadena = $cadena. "IDs de responsables en sistema:\n\n";
         for($i = 0; $i < count($colResponsables); $i++){
             $cadena = $cadena."[ID responsable: ".$colResponsables[$i]->getNumeroEmpleado() .
             "][Nombre: ".$colResponsables[$i]->getNombre()."][Apellido: ".$colResponsables[$i]->getApellido()."]\n";
@@ -686,7 +686,7 @@ function visualizarIDsEmpresas(){
     if(count($colEmpresas) == 0){
         $cadena = $cadena. "[Este sistema no tiene Empresas cargadas en la base de datos]\n";
     } else {
-        $cadena = $cadena. "IDs de empresas en sistema:\n";
+        $cadena = $cadena. "IDs de empresas en sistema:\n\n";
         for($i = 0; $i < count($colEmpresas); $i++){
             $cadena = $cadena."[ID empresa: ".$colEmpresas[$i]->getIdEmpresa().
             "][Nombre: ".$colEmpresas[$i]->getNombreEmpresa()."]\n";
@@ -713,7 +713,7 @@ function visualizarViajesResponsable($idResponsable){
         $cadena = $cadena. "El responsable [ID: ".$idResponsable."] no se encuentra asignado a ningún viaje\n";
 
     } else {
-        $cadena = $cadena. "El responsable [ID: ".$idResponsable."] se encuentra asignado a los siguientes viajes:\n";
+        $cadena = $cadena. "El responsable [ID: ".$idResponsable."] se encuentra asignado a los siguientes viajes:\n\n";
 
         for ($i = 0; $i < count($colViajes); $i++){
             $cadena = $cadena. "[ID viaje: ".$colViajes[$i]->getCodigo()."]";
