@@ -640,7 +640,7 @@ function visualizarIDsViajes($empresaActiva){
         $cadena = $cadena. "IDs de viajes correspondientes a la empresa activa [ID empresa: ".$idEmpresa."][Nombre: ".$nombreEmpresa."]\n\n";
         for($i = 0; $i < count($colViajes); $i++){
             $cadena = $cadena."[ID viaje: ".$colViajes[$i]->getCodigo() ."][Destino: ".$colViajes[$i]->getDestino().
-            "][Costo de pasaje sin impuestos: $".$colViajes[$i]->getCostoPasaje().
+            "][Costo de pasaje sin recargo: $".$colViajes[$i]->getCostoPasaje().
             "][Asientos disponibles: ".$colViajes[$i]->cantidadAsientosDisponibles()."]\n";
         }
     }
