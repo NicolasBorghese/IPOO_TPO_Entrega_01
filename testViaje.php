@@ -1047,9 +1047,11 @@ function crearPasajero($idViaje, $ultimoTicket){
         $permitido = true;
         echo "Número de documento del pasajero (campo obligatorio): ";
         $documento = trim(fgets(STDIN));
-        if($documento == ""){
+        //Se controla que el documenta sea si o si un entero por la modificación del 
+        //tipo de clave primaria en la base de datos
+        if($documento == "" || !ctype_digit($documento)){
             $permitido = false;
-            echo "ERROR: No puede ingresar un número de documento nulo.\n";
+            echo "ERROR: valor ingresado para documento elegido inválido.\n";
         }
     } while (!$permitido);
     echo "Teléfono del pasajero: ";

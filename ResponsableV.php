@@ -195,10 +195,11 @@ class ResponsableV{
 			if($base->Ejecutar($consulta)){
 				if($fila = $base->Registro()){	
 
-				    $this->setNumeroEmpleado($numeroEmpleado);
-                    $this->setNumeroLicencia($fila['rnumerolicencia']);
-					$this->setNombre($fila['rnombre']);
-                    $this->setApellido($fila['rapellido']);
+                    $numeroLicencia = $fila['rnumerolicencia'];
+					$nombre = $fila['rnombre'];
+                    $apellido = $fila['rapellido'];
+
+                    $this->cargar($numeroEmpleado, $numeroLicencia, $nombre, $apellido);
 
 					$exito = true;
 				}				

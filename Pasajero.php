@@ -251,13 +251,15 @@ class Pasajero{
 			if($base->Ejecutar($consulta)){
 				if($fila = $base->Registro()){	
 
-				    $this->setDocumento($documento);
-					$this->setNombre($fila['pnombre']);
-					$this->setApellido($fila['papellido']);
-					$this->setTelefono($fila['ptelefono']);
-                    $this->setNumeroAsiento($fila['pnumeroasiento']);
-                    $this->setNumeroTicket($fila['pnumeroticket']);
-                    $this->setIdViaje($fila['idviaje']);
+					$nombre = $fila['pnombre'];
+					$apellido = $fila['papellido'];
+					$telefono = $fila['ptelefono'];
+                    $numeroAsiento = $fila['pnumeroasiento'];
+                    $numeroTicket = $fila['pnumeroticket'];
+                    $idViaje = $fila['idviaje'];
+
+                    $this->cargar($nombre, $apellido, $documento, $telefono, $numeroAsiento,
+                    $numeroTicket, $idViaje);
 
 					$exito = true;
 				}				

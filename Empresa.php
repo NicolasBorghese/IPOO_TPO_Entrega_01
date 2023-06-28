@@ -197,9 +197,10 @@ class Empresa{
 			if($base->Ejecutar($consulta)){
 				if($fila = $base->Registro()){	
 
-				    $this->setIdEmpresa($idEmpresa);
-                    $this->setNombreEmpresa($fila['enombre']);
-					$this->setDireccionEmpresa($fila['edireccion']);
+                    $nombreEmpresa = $fila['enombre'];
+					$direccionEmpresa = $fila['edireccion'];
+
+                    $this->cargar($idEmpresa, $nombreEmpresa, $direccionEmpresa, []);
 
 					$exito = true;
 				}				

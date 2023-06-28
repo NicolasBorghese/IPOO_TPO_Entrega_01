@@ -958,34 +958,29 @@ class Viaje{
 			if($base->Ejecutar($consulta)){
 				if($fila = $base->Registro()){	
 
-				    $this->setCodigo($codigo);
-                    $this->setDestino($fila['vdestino']);
-                    $this->setCantMaxPasajeros($fila['vcantmaxpasajeros']);
+                    $destino = $fila['vdestino'];
+                    $cantMaxPasajeros = ($fila['vcantmaxpasajeros']);
 
                     $idResponsable = $fila['rnumeroempleado'];
                     $responsable = new ResponsableV();
                     $responsable->Buscar($idResponsable);
                     if($responsable == false){
-                        $this->setResponsable(null);
-                    } else {
-                        $this->setResponsable($responsable);
+                        $responsable = null;
                     }
 
                     $idEmpresa = $fila['idempresa'];
                     $empresa = new Empresa();
                     $empresa->Buscar($idEmpresa);
                     if($empresa == false){
-                        $this->setEmpresa(null);
-                    } else {
-                        $this->setEmpresa($empresa);
+                        $empresa = null;
                     }
                     
-                    $this->setCostoPasaje($fila['vimporte']);
-                    $this->setRecaudacionTotal($fila['vrecaudacion']);
+                    $costoPasaje = ($fila['vimporte']);
 
                     $pasajero = new Pasajero();
                     $colPasajeros = $pasajero->listar("pasajero.idviaje = ".$codigo);
-                    $this->setColPasajeros($colPasajeros);
+
+                    $this->cargar($codigo, $destino, $cantMaxPasajeros, $colPasajeros, $responsable, $empresa, $costoPasaje);
 
 					$exito = true;
 				}				
