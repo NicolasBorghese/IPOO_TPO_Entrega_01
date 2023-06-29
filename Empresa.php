@@ -1,4 +1,5 @@
 <?php
+//Por Nicolás Borghese 2023
 
 class Empresa{
 
@@ -359,5 +360,4 @@ class Empresa{
         $this->eliminar();
     }
 }
-
 ?>
