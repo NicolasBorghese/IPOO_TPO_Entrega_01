@@ -30,5 +30,5 @@ en el dominio a lo largo del cuatrimestre.
 
 <!-- MARKDOWN LINKS AND IMAGES -->
 
-[php-shield]: https://img.shields.io/badge/PHP-9da9be?style=for-the-badge&logo=php&logoColor=php
+[php-shield]: https://img.shields.io/badge/PHP-373841?style=for-the-badge&logo=php&logoColor=php
 [php-url]: https://www.php.net/manual/es/intro-whatis.php
