@@ -1,6 +1,6 @@
 # TRABAJO FINAL ENTREGABLE (IPOO)
 
-IPOO TP 4 ENTREGABLE Fecha de cierre 21/06/23
+## IPOO TP 4 ENTREGABLE Fecha de cierre 21/06/23
 
 Esta rama corresponde a la entrega número 4 del TP obligatorio de IPOO (TRABAJO FINAL).
 Este TPO extiende las funcionalidades desarrolladas en los TP ENTREGABLES 1, 2 y 3 incorporando el tema de mapeo objeto relacional (MOR).
@@ -20,3 +20,6 @@ y eliminar la información de la empresa de viajes.
 3. Implementar dentro de la clase TestViajes una operación que permita ingresar, modificar
 y eliminar la información de un viaje, teniendo en cuenta las particularidades expuestas
 en el dominio a lo largo del cuatrimestre.
+
+## MER del proyecto
+![MER del proyecto viaje Feliz](img/MER%20Viaje%20Feliz%2002%20Sin%20herencia.png)
