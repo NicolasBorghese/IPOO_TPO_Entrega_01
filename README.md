@@ -27,3 +27,7 @@ en el dominio a lo largo del cuatrimestre.
 ## Desarrollado con
 
 - [![PHP][php-shield]][php-url]
+
+<!-- MARKDOWN LINKS AND IMAGES -->
+[php-shield]: https://img.shields.io/badge/PHP-grey?style=plastic&logo=php&logoColor=php
+[php-url]: https://www.php.net/manual/es/intro-whatis.php
