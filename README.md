@@ -5,7 +5,7 @@
 Esta rama corresponde a la entrega número 4 del TP obligatorio de IPOO (TRABAJO FINAL).
 Este TPO extiende las funcionalidades desarrolladas en los TP ENTREGABLES 1, 2 y 3 incorporando el tema de mapeo objeto relacional (MOR).
 
-* ENUNCIADO:
+### ENUNCIADO:
 
 Una empresa de transporte desea gestionar la información correspondiente a los viajes que
 realiza. De los pasajeros se conoce su nombre, apellido, número de documento y teléfono. El
@@ -21,5 +21,9 @@ y eliminar la información de la empresa de viajes.
 y eliminar la información de un viaje, teniendo en cuenta las particularidades expuestas
 en el dominio a lo largo del cuatrimestre.
 
-## MER del proyecto
+### MER del proyecto
 ![MER del proyecto viaje Feliz](img/MER%20Viaje%20Feliz%2002%20Sin%20herencia.png)
+
+## Desarrollado con
+
+- [![PHP][php-shield]][php-url]
